@@ -33,13 +33,21 @@
   };
   window.addEventListener('resize', onResize, false);
 
-  // add cube
-  var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-  var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-  var cube = new THREE.Mesh( geometry, material );
-  scene.add( cube );
+  var light = new THREE.PointLight(0xffffff, 1, 1000);
+  scene.add(light);
 
-  camera.position.z = 2;
+  //
+  // ADD CUBES (blah blah)
+  //
+  //
+
+  var cubeGeo = new THREE.BoxGeometry(0.032, 0.032, 0.032);
+  var cubeMesh = new THREE.MeshPhongMaterial({color: 0x00cc00});
+
+  // forwards
+  var cube = new THREE.Mesh(cubeGeo, cubeMesh);
+  cube.position.set(-0.06,-0.03,-0.3);
+  scene.add(cube);
 
   //
   // ADD LEAP MOTION
