@@ -6,7 +6,6 @@
   //
 
   var scene = new THREE.Scene();
-  scene.add( new THREE.GridHelper( 10, 2.5 ) );
 
   var camera = new THREE.PerspectiveCamera(
     75,
@@ -34,99 +33,13 @@
   };
   window.addEventListener('resize', onResize, false);
 
+  // add cube
+  var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+  var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+  var cube = new THREE.Mesh( geometry, material );
+  scene.add( cube );
 
-  var light = new THREE.PointLight(0xffffff, 1, 1000);
-  scene.add(light);
-
-  axisHelper = new THREE.AxisHelper(0.060);
-  axisHelper.position.set(0,-0.03,-0.30);
-  scene.add(axisHelper);
-
-  //
-  // ADD CUBES (blah blah)
-  //
-  //
-
-  var cubeGeo = new THREE.BoxGeometry(0.032, 0.032, 0.032);
-  var cubeMesh = new THREE.MeshPhongMaterial({color: 0x00cc00});
-
-  // forwards
-  var cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.06,-0.03,-0.3);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.06,-0.03,-0.3);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.06,-0.03,-0.42);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.06,-0.03,-0.42);
-  scene.add(cube);
-
-
-  // right
-  cubeMesh = new THREE.MeshPhongMaterial({color: 0x0000cc});
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.3,-0.03,-0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.3,-0.03,0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.42,-0.03,-0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.42,-0.03,0.06);
-  scene.add(cube);
-
-  // left
-  cubeMesh = new THREE.MeshPhongMaterial({color: 0xcc0000});
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.3,-0.03,-0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.3,-0.03,0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.42,-0.03,-0.06);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.42,-0.03,0.06);
-  scene.add(cube);
-
-
-  // back
-  cubeMesh = new THREE.MeshPhongMaterial({color: 0xcccc00});
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.06,-0.03,0.3);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.06,-0.03,0.3);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(-0.06,-0.03,0.42);
-  scene.add(cube);
-
-  cube = new THREE.Mesh(cubeGeo, cubeMesh);
-  cube.position.set(0.06,-0.03,0.42);
-  scene.add(cube);
-
-
+  camera.position.z = 2;
 
   //
   // ADD LEAP MOTION
@@ -134,7 +47,13 @@
   //
 
   // Connect to localhost and start getting frames
-  Leap.loop();
+  Leap.loop({
+
+    hand: function(hand){
+      console.log( hand.screenPosition() );
+    }
+
+  }).use('screenPosition');
 
   // Docs: http://leapmotion.github.io/leapjs-plugins/main/transform/
   Leap.loopController.use('transform', {
