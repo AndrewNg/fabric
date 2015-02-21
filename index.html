@@ -16,10 +16,11 @@
     <script type="text/javascript" src="js/VRControls.js"></script>
     <script type="text/javascript" src="js/VREffect.js"></script>
     <script type="text/javascript">
-      var camera, scene, renderer, projector, light;
+      var camera, scene, renderer, projector, light, vrControls, vrEffect;
       var objects = [], objectsControls = [], cameraControls;
       var coords1, coords2, coords3, extendedFingers;
       var lastControlsIndex = -1, controlsIndex = -1, index = -1;
+
 
       function init() {
         // is webgl supported?
@@ -28,17 +29,29 @@
           return false;
         };
 
-        // renderer
-        renderer = new THREE.WebGLRenderer({antialias: true});
-        renderer.setSize($(window).width(), $(window).height());
-        renderer.setClearColor(0xffffff, 1);
-        $("#container").append(renderer.domElement);
+        // // renderer
+        // renderer = new THREE.WebGLRenderer({antialias: true});
+        // renderer.setSize($(window).width(), $(window).height());
+        // renderer.setClearColor(0xffffff, 1);
+        // $("#container").append(renderer.domElement);
+
+        var canvas = document.getElementById('scene');
+        canvas.style.position = 'absolute';
+        canvas.style.top = 0;
+        canvas.style.left = 0;
+
+        renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          canvas: canvas
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
 
         // camera
         camera = new THREE.PerspectiveCamera(25, $(window).width()/$(window).height(), 0.1, 10000);
-        camera.position.x = 500;
-        camera.position.y = 500;
-        camera.position.z = 500;
+        camera.position.x = 100;
+        camera.position.y = 100;
+        camera.position.z = 100;
         var origin = new THREE.Vector3(0, 0, 0);
         camera.lookAt(origin);
 
@@ -131,9 +144,6 @@
 
         // listen to resize event
         window.addEventListener('resize', onWindowResize, false);
-
-        // render (if no leap motion controller is detected, then this call is needed in order to see the plot)
-        render();
       };
 
       function changeControlsIndex() {
@@ -214,14 +224,17 @@
       };
 
       function render() {
-        renderer.render(scene, camera);
+        vrControls.update();
+        vrEffect.render(scene, camera);
+
+        requestAnimationFrame(render);
       };
 
       function onWindowResize() {
         camera.aspect = $(window).width()/$(window).height();
         camera.updateProjectionMatrix();
         renderer.setSize($(window).width(), $(window).height());
-        render();
+        renderer.render(scene, camera);
       };
 
       $(function(){
@@ -255,13 +268,67 @@
           // coords3.position = cameraControls.target;
           light.position   = camera.position;
 
-          render();
         });
+
+
+
+        //
+        // ADD VIRTUAL REALITY
+        //
+        //
+
+        // Moves (translates and rotates) the camera
+        vrControls = new THREE.VRControls(camera);
+
+        vrEffect = new THREE.VREffect(renderer);
+
+
+        var onkey = function(event) {
+          if (event.key === 'z') {
+            vrControls.zeroSensor();
+          }
+          if (event.key === 'f') {
+            return vrEffect.setFullScreen(true);
+          }
+        };
+
+        window.addEventListener("keypress", onkey, true);
+
+        // render (if no leap motion controller is detected, then this call is needed in order to see the plot)
+
+        render();
 
 
 
         // detect controls change
         setInterval(changeControlsIndex, 250);
+
+          //
+          // Add a debug message Real quick
+          // Prints out when receiving oculus data.
+          //
+          //
+
+          var receivingPositionalData = false;
+          var receivingOrientationData = false;
+
+          var timerID = setInterval(function(){
+
+            if (camera.position.x !== 0 && !receivingPositionalData){
+              receivingPositionalData = true;
+              console.log("receiving positional data");
+            }
+
+            if (camera.quaternion.x !== 0 && !receivingOrientationData){
+              receivingOrientationData = true;
+              console.log("receiving orientation data");
+            }
+
+            if (receivingOrientationData && receivingPositionalData){
+              clearInterval(timerID);
+            }
+
+          }, 2000);
       });
     </script>
   </head>
@@ -278,7 +345,7 @@
 
       <b>SWITCHING</b> ➞ 1 Hand &amp; 1 Finger &amp; Choose object or nothing
     </div>
-    <div id="container"></div>
+    <canvas id="scene"></canvas>
     <div id="cursor"></div>
   </body>
 </html>
