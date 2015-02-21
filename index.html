@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var camera, scene, renderer, projector, light;
       var objects = [], objectsControls = [], cameraControls;
-      var coords1, coords2, coords3;
+      var coords1, coords2, coords3, extendedFingers;
       var lastControlsIndex = -1, controlsIndex = -1, index = -1;
 
       function init() {
@@ -166,12 +166,14 @@
 
       function showCursor(frame) {
         var hl = frame.hands.length;
-        var fl = frame.pointables.length;
+        var fl = frame.fingers.filter(function(f){return f.extended}).length;;
+
+        console.log(fl);
 
 
         //console.log("Extended fingers: " + extendedFingers);
 
-        if (hl == 1 && fl == 5) {
+        if (hl == 1 && fl == 1) {
           var f = frame.pointables[0];
           var cont = $(renderer.domElement);
           var offset = cont.offset();
@@ -186,9 +188,9 @@
 
       function focusObject(frame) {
         var hl = frame.hands.length;
-        var fl = frame.pointables.length;
+        var fl = frame.fingers.filter(function(f){return f.extended}).length;;
 
-        if (hl == 1 && fl == 5) {
+        if (hl == 1 && fl == 1) {
           var f = frame.pointables[0];
           var cont = $(renderer.domElement);
           var coords = transform(f.tipPosition, cont.width(), cont.height());
@@ -227,11 +229,14 @@
 
         // leap loop
         Leap.loop(function(frame) {
-          var extendedFingers = 0;
-        for(var f = 0; f < frame.fingers.length; f++){
-            var finger = frame.fingers[f];
-            if(finger.extended) extendedFingers++;
-        }
+        //   var extendedFingers = 0;
+        // for(var f = 0; f < frame.fingers.length; f++){
+        //     var finger = frame.fingers[f];
+        //     if(finger.extended) extendedFingers++;
+        // }
+
+          extendedFingers = frame.fingers.filter(function(f){return f.extended}).length;
+          //console.log(extendedFingers);
           // show cursor
           showCursor(frame);
 

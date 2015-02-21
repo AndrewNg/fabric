@@ -87,7 +87,7 @@ THREE.LeapObjectControls = function(camera, object) {
 
   this.applyGesture = function(frame, action) {
     var hl = frame.hands.length;
-    var fl = frame.pointables.length;
+    var fl = frame.fingers.filter(function(f){return f.extended}).length;;
 
     switch(action) {
       case 'rotate':
