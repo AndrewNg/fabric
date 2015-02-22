@@ -11,7 +11,7 @@ var handPosition = [];
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
-var cube;
+var selected = null;
 
 init();
 animate();
@@ -34,14 +34,23 @@ function initLeapMotion() {
 
   controller.on('frame', function(frame){
     var intersects = findObjects(frame, cubes);
-    for (var i = 0; i < cubes.children.length; i++) {
-      var grayness = cubes.children[i].grayness
-      cubes.children[i].material.color.setRGB(grayness, grayness, grayness );
+    if (intersects.length == 0) {
+      if (selected != null) {
+      var grayness = selected.grayness
+      selected.material.color.setRGB(grayness,grayness,grayness);
+      selected = null;
+      }
     }
-    for (var i = 0; i < intersects.length; i++) {
-      var obj = intersects[i].object;
-      obj.material.color.setHex(0xff0000);
-      controls[obj.id].update(frame);
+    else {
+      var object = intersects[0].object
+      if (selected.id != obj.id) {
+        var grayness = selected.grayness
+        selected.material.color.setRGB(grayness,grayness,grayness);
+      }
+      // if multiple selected, this will have to be a loop
+      selected = obj;
+      selected.material.color.setHex(0xff0000);
+      controls[selected.id].update(frame);
     }
 
     var hl = frame.hands.length;
@@ -119,7 +128,7 @@ function init() {
       geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
 
     }
-    cube = new THREE.Mesh( geom, mat );
+    var cube = new THREE.Mesh( geom, mat );
 
     cube.position.x = -25;
     cube.position.y = -25;
