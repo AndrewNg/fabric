@@ -106,8 +106,8 @@ function init() {
     cube.grayness = grayness; // *** NOTE THIS
     cubes.add(cube);
 
-    var morphVertex = function(val){
-      cube.morphTargetInfluences[0] = val;
+    var morphVertex = function(vertex, val){
+      cube.morphTargetInfluences[vertex] = val;
     }
 
     init.morphVertex = morphVertex;
