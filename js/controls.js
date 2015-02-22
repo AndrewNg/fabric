@@ -5,6 +5,7 @@ function focusObject(frame, objects) {
   var fl = frame.fingers.filter(function(f){return f.extended}).length;;
 
   if (hl == 1 && fl == 1) {
+    console.log(camera.position);
     var f = frame.pointables[0];
     var cont = $(renderer.domElement);
     var coords = transform(f.tipPosition, cont.width(), cont.height());
@@ -14,9 +15,6 @@ function focusObject(frame, objects) {
     vector.unproject(camera);
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
     var intersects = raycaster.intersectObjects(objects);
-    console.log(raycaster);
-    console.log(objects);
-    console.log(intersects);
     if (intersects.length > 0) {
       var i = 0;
       while(!intersects[i].object.visible) i++;

@@ -1,72 +1,22 @@
 var container, stats;
-var camera, scene, raycaster, renderer;
+var camera, scene, renderer;
 var vrEffect;
 var vrControls;
 var mouseControls;
 var headControls;
 var controller;
+var containerWidth, containerHeight;
+var range = 50;
 
-var mouse = new THREE.Vector2(), INTERSECTED;
-var radius = 100, theta = 0;
-var objects = [];
+var mouse = new THREE.Vector2();
+var cubes;
+var controls = [];
 
 init();
 animate();
 
-function init() {
-
-  container = document.createElement( 'div' );
-  document.body.appendChild( container );
-
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  scene = new THREE.Scene();
-
-  var light = new THREE.DirectionalLight( 0xffffff, 1 );
-  light.position.set( 1, 1, 1 ).normalize();
-  scene.add( light );
-
-  var geometry = new THREE.BoxGeometry( 20, 20, 20 );
-
-  var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-
-  object.position.x = 0;
-  object.position.y = 0;
-  object.position.z = 0;
-
-  object.rotation.x = Math.PI;
-  object.rotation.y = Math.PI;
-  object.rotation.z = Math.PI;
-
-    // leap object controls
-  var objectControls = new THREE.LeapObjectControls(camera, object);
-
-  objectControls.rotateEnabled  = true;
-  objectControls.rotateSpeed    = 3;
-  objectControls.rotateHands    = 1;
-  objectControls.rotateFingers  = [2, 3];
-
-  objectControls.scaleEnabled   = true;
-  objectControls.scaleSpeed     = 3;
-  objectControls.scaleHands     = 1;
-  objectControls.scaleFingers   = [4, 5];
-
-  objectControls.panEnabled     = true;
-  objectControls.panSpeed       = 3;
-  objectControls.panHands       = 2;
-  objectControls.panFingers     = [6, 12];
-  objectControls.panRightHanded = false; // for left-handed person
-
-  objects.push(object);
-  scene.add( object );
-
-  theta = Math.PI;
-
-  camera.position.x = -100;
-  camera.position.y = 0;
-  camera.position.z = -100;
-
-  camera.lookAt( object.position );
-
+// leap motion controller
+function initLeapMotion() { 
   window.controller = controller = new Leap.Controller({
     background: true
   });
@@ -82,22 +32,70 @@ function init() {
   });
 
   controller.on('frame', function(frame){
-    var index = focusObject(frame, objects);
+    var index = focusObject(frame, cubes);
     if(index != -1){
-      objectControls.update(frame);
+      for (var i = 0; i < cubes.children.length; i++) {
+        cubes.children[i].material.color.setHex(0x000000);
+      }
+      cubes.children[index].material.color.setHex(0xff0000);
+      controls.update(frame);
     }
   });
 
   controller.connect();
+}
 
-  // var trackHand = function(hand){
-  //   var handMesh = hand.data('riggedHand.mesh');
-  //   console.log(handMesh.position.x);
-  // };
+function init() {
+  container = document.createElement( 'div' )
+  document.body.appendChild( container );
+  
+  containerWidth = container.clientWidth;
+  containerHeight = container.clientHeight;
 
-  // controller.on('hand', trackHand);
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera( 45, containerWidth / containerHeight, 1, 10000 );
+  camera.position.set( 0, 0, range * 2 );
+  camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
-  raycaster = new THREE.Raycaster();
+  geom = new THREE.CubeGeometry( 5, 5, 5 );
+
+  cubes = new THREE.Object3D();
+
+  for(var i = 0; i < 100; i++ ) {
+    var grayness = Math.random() * 0.5 + 0.25,
+            mat = new THREE.MeshBasicMaterial(),
+            cube = new THREE.Mesh( geom, mat );
+    mat.color.setRGB( grayness, grayness, grayness );
+    cube.position.set( range * (0.5 - Math.random()), range * (0.5 - Math.random()), range * (0.5 - Math.random()) );
+    cube.rotation.set( Math.random(), Math.random(), Math.random() ).multiplyScalar( 2 * Math.PI );
+    cube.grayness = grayness; // *** NOTE THIS
+    cubes.add(cube);
+
+    // leap object controls
+    var control = new THREE.LeapObjectControls(camera, cube)
+
+    control.rotateEnabled  = true;
+    control.rotateSpeed    = 3;
+    control.rotateHands    = 1;
+    control.rotateFingers  = [2, 3];
+
+    control.scaleEnabled   = true;
+    control.scaleSpeed     = 3;
+    control.scaleHands     = 1;
+    control.scaleFingers   = [4, 5];
+
+    control.panEnabled     = true;
+    control.panSpeed       = 3;
+    control.panHands       = 2;
+    control.panFingers     = [6, 12];
+    control.panRightHanded = false; // for left-handed person
+
+    controls.push(control);
+  }
+
+  scene.add(cubes)
+
+  initLeapMotion();
 
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.setPixelRatio( window.devicePixelRatio );
@@ -183,32 +181,6 @@ function animate() {
 
 function render() {
   camera.updateMatrixWorld();
-
-  // find intersections
-
-  raycaster.setFromCamera( mouse, camera );
-
-  var intersects = raycaster.intersectObjects( scene.children );
-
-  if ( intersects.length > 0 ) {
-
-    if ( INTERSECTED != intersects[ 0 ].object ) {
-
-      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-      INTERSECTED = intersects[ 0 ].object;
-      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-      INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-    }
-
-  } else {
-
-    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-    INTERSECTED = null;
-
-  }
 
   headControls.update();
   vrEffect.render( scene, camera );
