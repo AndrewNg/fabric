@@ -40,10 +40,12 @@ app.get('/oculus', oculus)
 // endpoint for sending the final three.js object and STL file
 app.post('/export', function(req, res) {
     console.log('writing to gun');
+    console.log(req.body.image);
     gun.set({
         type: "STLFile",
         posi: modelCount,
         stl: req.body.stl,
+        img: req.body.image
         //json: req.body.json
     }).key('model/' + modelCount);
 
@@ -51,7 +53,31 @@ app.post('/export', function(req, res) {
         if(err) {
             console.log(err);
         } else {
-            console.log("The file was saved!");
+            console.log("The stl was saved!");
+    }
+    });
+
+    function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+        response = {};
+
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+      }
+
+      response.type = matches[1];
+      response.data = new Buffer(matches[2], 'base64');
+
+        return response;
+    }
+
+    var imageBuffer = decodeBase64Image(req.body.image);
+
+    fs.writeFile("./public/javascripts/" + modelCount + ".png", imageBuffer.data, function(err) {
+        if(err) {
+            console.log(err);
+        } else {
+            console.log("The image was saved!");
     }
     });
 

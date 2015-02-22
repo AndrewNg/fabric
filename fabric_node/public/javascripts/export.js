@@ -3,7 +3,7 @@
 var data = {};
 var loadGeoFromJSON;
 var cubeJSON;
-var modelCount = 0;
+// var modelCount = 0;
 
 // var scene = new THREE.Scene();
 // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -35,6 +35,7 @@ function exportGeometry(geo) {
   // formatCubeJSON = formatCubeJSON.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
   data.stl = STLFile;
+  data.image = renderer.domElement.toDataURL( 'image/png' )
   // data.json = formatCubeJSON;
 
   $.ajax({
@@ -52,9 +53,9 @@ function exportGeometry(geo) {
   });
 }
 
-function loadFromSTL() {
+function loadFromSTL(number) {
   var loader = new THREE.STLLoader();
-   loader.load( '/javascripts/' + modelCount + '.stl', function ( geometry ) {
+   loader.load( '/javascripts/' + number + '.stl', function ( geometry ) {
      scene.add( new THREE.Mesh( geometry ) );
    });
 }
