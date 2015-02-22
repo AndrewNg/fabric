@@ -165,3 +165,117 @@ var zoomCamera = function(){
 var rotateCamera = function(){
   camera.rotation.y = 90 * Math.PI / 180;
 }
+
+function destroyPrevObject(){
+  var selectedObject = scene.getObjectByName("destroyReady");
+  scene.remove( selectedObject );
+};
+
+function addObject(objectNum){
+  destroyPrevObject();
+
+  var possibilities = [
+    new THREE.BoxGeometry( 50, 50, 50 ),
+    new THREE.CylinderGeometry( 5, 5, 20, 32 ),
+    new THREE.DodecahedronGeometry( 10, 0 ),
+    new THREE.IcosahedronGeometry( 10, 0 ),
+    new THREE.OctahedronGeometry( 10, 0 ),
+    new THREE.PolyhedronGeometry( 
+    [
+    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+    ], 
+    [
+      2,1,0,    0,3,2,
+      0,4,7,    7,3,0,
+      0,1,5,    5,4,0,
+      1,2,6,    6,5,1,
+      2,3,7,    7,6,2,
+      4,5,6,    6,7,4
+    ], 
+    6, 2 ),
+    new THREE.SphereGeometry(50, 8, 6, 0, Math.PI * 2, 0, Math.PI),
+    new THREE.RingGeometry(15, 50, 8, 8, 0, Math.PI * 2),
+    new THREE.TetrahedronGeometry(10, 0)
+  ];
+
+  var geom = possibilities[objectNum];
+
+  objectCollection = new THREE.Object3D();
+
+  for(var i = 0; i < 1; i++ ) {
+    var grayness = Math.random() * 0.5 + 0.25;
+    var mat = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
+    mat.color.setRGB( grayness, grayness, grayness );
+    
+    for ( var i = 0; i < geom.vertices.length; i ++ ) {
+
+      var vertices = [];
+
+      for ( var v = 0; v < geom.vertices.length; v ++ ) {
+
+        vertices.push( geom.vertices[ v ].clone() );
+
+        if ( v === i ) {
+
+          vertices[ vertices.length - 1 ].x *= 2;
+          vertices[ vertices.length - 1 ].y *= 2;
+          vertices[ vertices.length - 1 ].z *= 2;
+
+        }
+
+      }
+
+      geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
+
+    }
+    var collectionItem = new THREE.Mesh( geom, mat );
+
+    collectionItem.position.x = -25;
+    collectionItem.position.y = -25;
+    collectionItem.position.z = -25;
+
+    collectionItem.scale.x = 1;
+    collectionItem.scale.y = 1;
+    collectionItem.scale.z = 1;
+
+    collectionItem.grayness = grayness; // *** NOTE THIS
+    objectCollection.add(collectionItem);
+
+    // leap object controls
+    var control = new THREE.LeapObjectControls(camera, collectionItem)
+
+    control.rotateEnabled  = true;
+    control.rotateSpeed    = 3;
+    control.rotateHands    = 1;
+    control.rotateFingers  = [2, 3];
+
+    control.scaleEnabled   = true;
+    control.scaleSpeed     = 3;
+    control.scaleHands     = 1;
+    control.scaleFingers   = [4, 5];
+
+    control.panEnabled     = true;
+    control.panSpeed       = 3;
+    control.panHands       = 2;
+    control.panFingers     = [6, 12];
+    control.panRightHanded = false; // for left-handed person
+
+    controls[collectionItem.id] = control;
+  }
+
+  objectCollection.name = "destroyReady";
+
+  scene.add(objectCollection)
+};
+
+function addKeyObjects(){
+  $(document).keydown(function(e){
+    switch(e.keyCode){
+      default: 
+        addObject(e.keyCode - 49);
+        return false;
+        break;
+    }
+  });
+};
