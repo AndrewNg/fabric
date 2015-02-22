@@ -1,13 +1,29 @@
 var projector = new THREE.Projector();
 
-function rotation(frame, object) {
+function translation(frame, object) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
   var rotates = [];
 
   if (hl == 1 && fl == 2) {
+    console.log("translation");
+    var vector = new THREE.Vector3(0, 0, 0);
+    translateObject(object, vector);
+    return true;
+  }
+
+  return false;
+}
+
+function rotation(frame, object) {
+  var hl = frame.hands.length;
+  var fl = frame.fingers.filter(function(f){return f.extended}).length;
+  var rotates = [];
+
+  if (hl == 1 && fl == 4) {
     console.log("rotation");
-    return true
+    rotateObject(object, 2);
+    return true;
   }
 
   return false;
@@ -50,3 +66,55 @@ function transform(tipPosition, w, h) {
   var y = THREE.Math.mapLinear(fty, minHeight, maxHeight, 0, h);
   return [x, y];
 };
+
+var morphVertex = function(obj, vertex, val){
+  obj.morphTargetInfluences[vertex] = val;
+}
+
+var scaleObject = function(obj, val){
+  obj.scale.set(val,val,val);
+}
+
+var rotateObject = function(obj, axis){
+  var rotObjectMatrix;
+  function rotateAroundObjectAxis(object, axis, radians) {
+      rotObjectMatrix = new THREE.Matrix4();
+      rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+
+      object.matrix.multiply(rotObjectMatrix);
+
+      object.rotation.setFromRotationMatrix(object.matrix);
+  }
+
+  var rotWorldMatrix;
+  // Rotate an object around an arbitrary axis in world space       
+  function rotateAroundWorldAxis(object, axis, radians) {
+      rotWorldMatrix = new THREE.Matrix4();
+      rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+
+      rotWorldMatrix.multiply(object.matrix);
+
+      object.matrix = rotWorldMatrix;
+      object.rotation.setFromRotationMatrix(object.matrix);
+  }
+
+  // x axis, y axis, and z axis
+  var axes = [(new THREE.Vector3(1,0,0)), (new THREE.Vector3(0,1,0)), (new THREE.Vector3(0,0,1))];
+
+  rotateAroundWorldAxis(obj, axes[axis], Math.PI / 180);
+}
+
+var zoomCamera = function(){
+  var zoomFactor = 1.0, inc = 0.1; 
+  while(zoomFactor < 2){
+    // setTimeout(function(){
+    //   camera.fov *= zoomFactor;
+    //   camera.updateProjectionMatrix();
+    //   zoom += inc;
+    // }, 10);
+  }
+}
+
+var rotateCamera = function(){
+  camera.rotation.y = 90 * Math.PI / 180;
+}
