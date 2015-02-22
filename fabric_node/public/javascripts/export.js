@@ -3,6 +3,7 @@
 var data = {};
 var loadGeoFromJSON;
 var cubeJSON;
+var animatedObject;
 // var modelCount = 0;
 
 // var scene = new THREE.Scene();
@@ -56,6 +57,11 @@ function exportGeometry(geo) {
 function loadFromSTL(number) {
   var loader = new THREE.STLLoader();
    loader.load( '/javascripts/' + number + '.stl', function ( geometry ) {
-     scene.add( new THREE.Mesh( geometry ) );
+     animatedObject = new THREE.Mesh(geometry);
+     scene.add( animatedObject );
    });
+}
+
+function removeFromSTL() {
+  scene.remove(animatedObject);
 }
