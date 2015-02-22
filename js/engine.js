@@ -7,6 +7,7 @@ var headControls;
 var controller;
 var theta = Math.PI;
 var pinchStrength;
+var handPosition = [];
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
@@ -39,9 +40,18 @@ function initLeapMotion() {
     }
     for (var i = 0; i < intersects.length; i++) {
       var obj = intersects[i].object;
-      console.log(obj);
       obj.material.color.setHex(0xff0000);
       controls[obj.id].update(frame);
+    }
+
+    var hl = frame.hands.length;
+    var fl = frame.fingers.filter(function(f){return f.extended}).length;
+
+    if (hl == 1 && fl == 1) {
+      var f = frame.pointables[0];
+      var cont = $(renderer.domElement);
+      var coords = transform(f.tipPosition, cont.width(), cont.height());
+      handPosition = coords;
     }
   });
 
@@ -65,13 +75,23 @@ function init() {
   camera.position.z = 100;
   camera.lookAt( scene.position );
 
+  // world coordinate system (thin dashed helping lines)
+  var origin = new THREE.Vector3(0, 0, 0);
+  var lineGeometry = new THREE.Geometry();
+  var vertArray = lineGeometry.vertices;
+  vertArray.push(new THREE.Vector3(1000, 0, 0), origin, new THREE.Vector3(0, 1000, 0), origin, new THREE.Vector3(0, 0, 1000));
+  lineGeometry.computeLineDistances();
+  var lineMaterial = new THREE.LineDashedMaterial({color: 0xcccccc, dashSize: 1, gapSize: 2});
+  var coords = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(coords);
+
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
 
   var geom = new THREE.BoxGeometry( 50, 50, 50 );
 
-  cubes = new THREE.Object3D()
+  cubes = new THREE.Object3D();
 
   for(var i = 0; i < 1; i++ ) {
     var grayness = Math.random() * 0.5 + 0.25;
@@ -101,9 +121,9 @@ function init() {
     }
     cube = new THREE.Mesh( geom, mat );
 
-    cube.position.x = -10;
-    cube.position.y = -10;
-    cube.position.z = -10;
+    cube.position.x = -25;
+    cube.position.y = -25;
+    cube.position.z = -25;
 
     cube.scale.x = 1;
     cube.scale.y = 1;
@@ -149,9 +169,21 @@ function init() {
       rotateAroundWorldAxis(cube, axes[axis], Math.PI / 180);
     }
 
+    var cameraZoom = function(){
+      var zoomFactor = 1.0, inc = 0.1; 
+      while(zoomFactor < 2){
+        // setTimeout(function(){
+        //   camera.fov *= zoomFactor;
+        //   camera.updateProjectionMatrix();
+        //   zoom += inc;
+        // }, 10);
+      }
+    }
+
     init.morphVertex = morphVertex;
     init.scaleObject = scaleObject;
     init.rotateObject = rotateObject;
+    init.cameraZoom = cameraZoom;
 
     // leap object controls
     var control = new THREE.LeapObjectControls(camera, cube)
@@ -173,7 +205,6 @@ function init() {
     control.panRightHanded = false; // for left-handed person
 
     controls[cube.id] = control;
-    console.log(controls);
   }
 
   scene.add(cubes)
