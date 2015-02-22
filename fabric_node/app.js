@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Gun = require('gun');
 var fs = require('fs');
-var modelCount = 0;
+var modelCount = 10;
 
 var routes = require('./routes/index');
 var oculus = require('./routes/oculus');
