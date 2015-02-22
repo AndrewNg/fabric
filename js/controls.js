@@ -1,13 +1,25 @@
 var projector = new THREE.Projector();
 
-function translation(frame, object) {
+function translation(frame, object, prev) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
-  var rotates = [];
+  console.log('translate?');
+  console.log(hl);
+  console.log(fl);
+  console.log(prev);
 
-  if (hl == 1 && fl == 2) {
+  if (hl == 1 && fl == 2 && prev != null) {
     console.log("translation");
-    var vector = new THREE.Vector3(0, 0, 0);
+
+    var cont = $(renderer.domElement);
+    var fromCoords = transform(prev, cont.width(), cont.height());
+
+    var f = frame.pointables[0];
+    var toCoords = transform(f.tipPosition, cont.width(), cont.height());
+
+    var vector = new THREE.Vector3(toCoords[0] - fromCoords[0], toCoords[1] - fromCoords[1], 0);
+  
+
     translateObject(object, vector);
     return true;
   }
@@ -18,7 +30,6 @@ function translation(frame, object) {
 function rotation(frame, object) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
-  var rotates = [];
 
   if (hl == 1 && fl == 4) {
     console.log("rotation");

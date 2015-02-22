@@ -14,6 +14,7 @@ var controls = [];
 var selected = null;
 var lastSelected = null;
 var timer;
+var prevPointable = null;
 
 init();
 animate();
@@ -26,6 +27,16 @@ var unHighlightObject = function(object) {
   var grayness = object.grayness
   object.material.color.setRGB(grayness,grayness,grayness);
 };
+
+var setPrevPointable = function(frame){
+  var f = frame.pointables[0];
+  if (typeof f == "undefined") {
+    prevPointable = null;
+  }
+  else {
+    prevPointable = f.tipPosition;
+  } 
+}
 
 // leap motion controller
 function initLeapMotion() { 
@@ -44,6 +55,9 @@ function initLeapMotion() {
   });
 
   controller.on('frame', function(frame){
+    if (prevPointable == null) {
+      setPrevPointable(frame);
+    }
     var selects = selector(frame, cubes);
     if (selects.length == 0) {
       if (selected != null) {
@@ -70,7 +84,7 @@ function initLeapMotion() {
       if (timer.lap() <= 250) {
         selected = lastSelected; 
         highlightObject(selected);
-        if (translation(frame, selected) || 
+        if (translation(frame, selected, prevPointable) || 
             rotation(frame, selected)) {
           timer = new Stopwatch();
           timer.start();
@@ -87,15 +101,7 @@ function initLeapMotion() {
       }
     }
 
-    var hl = frame.hands.length;
-    var fl = frame.fingers.filter(function(f){return f.extended}).length;
-
-    if (hl == 1 && fl == 1) {
-      var f = frame.pointables[0];
-      var cont = $(renderer.domElement);
-      var coords = transform(f.tipPosition, cont.width(), cont.height());
-      handPosition = coords;
-    }
+    setPrevPointable(frame);
   });
 
   var getPinchStrength = function(hand){
