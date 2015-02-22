@@ -32,6 +32,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/oculus', oculus);
 
+app.get('/', function (req, res) {
+});
+
+app.get('/oculus', oculus)
+
 // endpoint for sending the final three.js object and STL file
 app.post('/export', function(req, res) {
     console.log('writing to gun');
@@ -39,7 +44,7 @@ app.post('/export', function(req, res) {
         type: "STLFile",
         posi: modelCount,
         stl: req.body.stl,
-        json: req.body.json
+        //json: req.body.json
     }).key('model/' + modelCount);
 
     fs.writeFile("./public/javascripts/" + modelCount + ".stl", req.body.stl, function(err) {

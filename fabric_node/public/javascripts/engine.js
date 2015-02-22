@@ -39,6 +39,28 @@ var setPrevPointable = function(frame){
   } 
 }
 
+// myo init
+function initMyo() {
+  var hub = new Myo.Hub();
+
+  hub.on('ready', function() {
+      console.log("myo ready");
+  });
+  hub.on('connect', function() {
+      console.log("myo connected");
+  });
+  hub.on('frame', function(frame) {
+      // Get the most recent frame and report some basic information
+      console.log("Frame id: " + frame.id + ", timestamp: " + frame.timestamp);
+      if (false) {
+        exportGeometry(cubes.children[0].geometry);
+      }
+  });
+  hub.on('disconnect', function() {
+      console.log("myo disconnect");
+  });
+} 
+
 // leap motion controller
 function initLeapMotion() { 
   window.controller = controller = new Leap.Controller({
@@ -87,7 +109,8 @@ function initLeapMotion() {
         highlightObject(selected);
         if (translation(frame, selected, prevPointable) || 
             rotation(frame, selected, prevPointable) || 
-            scale(frame, selected, prevPointable)) {
+            scale(frame, selected, prevPointable) || 
+            morph(frame, selected, prevPointable)) {
           timer = new Stopwatch();
           timer.start();
         }
@@ -143,6 +166,8 @@ function init() {
   addObject(4);
 
   initLeapMotion();
+
+  initMyo();
 
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.setPixelRatio( window.devicePixelRatio );

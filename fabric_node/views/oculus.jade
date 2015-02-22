@@ -1,1 +1,22 @@
-p oculus stuff goes here
+extends layout
+
+block content
+  .menu
+    .button.mouse-look Enable Mouse Look
+    .button.full-screen Start VR Mode
+  script(src='/javascripts/lib/three.min.js')
+  script(src='/javascripts/vr/MouseControls.js')
+  script(src='/javascripts/vr/VREffect.js')
+  script(src='/javascripts/vr/VRControls.js')
+  script(src='/javascripts/lib/stats.min.js')
+  script(src='/javascripts/leap/leap-0.6.4.min.js')
+  script(src='/javascripts/leap/leap-plugins-0.1.11pre.min.js')
+  script(src='/javascripts/lib/LeapObjectControls.js')
+  script(src='/javascripts/lib/jquery-1.11.2.min.js')
+  script(src='/javascripts/lib/myojs-0.8.7.min.js')
+  script(src="/javascripts/FileSaver.js")
+  script(src="/javascripts/STLFileSaver.js")
+  script(src="/javascripts/STLLoader.js")
+  script(src='/javascripts/export.js')
+  script(src='/javascripts/controls.js')
+  script(src='/javascripts/engine.js')
