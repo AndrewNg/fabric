@@ -3,7 +3,7 @@
 var data = {};
 var loadGeoFromJSON;
 var cubeJSON;
-var modelCount;
+var modelCount = 0;
 
 // var scene = new THREE.Scene();
 // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -54,7 +54,7 @@ function exportGeometry(geo) {
 
 function loadFromSTL() {
   var loader = new THREE.STLLoader();
-   loader.load( '/javascripts/' + '1' + '.stl', function ( geometry ) {
+   loader.load( '/javascripts/' + modelCount + '.stl', function ( geometry ) {
      scene.add( new THREE.Mesh( geometry ) );
    });
 }
