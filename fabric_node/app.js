@@ -9,7 +9,7 @@ var fs = require('fs');
 var modelCount = 0;
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var oculus = require('./routes/oculus');
 
 // initialize gun
 var gun = Gun({
@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/oculus', oculus);
 
 // endpoint for sending the final three.js object and STL file
 app.post('/export', function(req, res) {
