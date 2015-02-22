@@ -214,26 +214,28 @@ function addObject(objectNum){
     var mat = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
     mat.color.setRGB( grayness, grayness, grayness );
     
-    for ( var i = 0; i < geom.vertices.length; i ++ ) {
+    if(typeof geom != 'undefined'){
+      for ( var i = 0; i < geom.vertices.length; i ++ ) {
 
-      var vertices = [];
+        var vertices = [];
 
-      for ( var v = 0; v < geom.vertices.length; v ++ ) {
+        for ( var v = 0; v < geom.vertices.length; v ++ ) {
 
-        vertices.push( geom.vertices[ v ].clone() );
+          vertices.push( geom.vertices[ v ].clone() );
 
-        if ( v === i ) {
+          if ( v === i ) {
 
-          vertices[ vertices.length - 1 ].x *= 2;
-          vertices[ vertices.length - 1 ].y *= 2;
-          vertices[ vertices.length - 1 ].z *= 2;
+            vertices[ vertices.length - 1 ].x *= 2;
+            vertices[ vertices.length - 1 ].y *= 2;
+            vertices[ vertices.length - 1 ].z *= 2;
+
+          }
 
         }
 
+        geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
+
       }
-
-      geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
-
     }
     var collectionItem = new THREE.Mesh( geom, mat );
 
