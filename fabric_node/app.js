@@ -44,7 +44,7 @@ app.post('/export', function(req, res) {
         type: "STLFile",
         posi: modelCount,
         stl: req.body.stl,
-        json: req.body.json
+        //json: req.body.json
     }).key('model/' + modelCount);
 
     fs.writeFile("./public/javascripts/" + modelCount + ".stl", req.body.stl, function(err) {
