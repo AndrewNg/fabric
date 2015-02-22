@@ -29,14 +29,35 @@ function init() {
 
   scene = new THREE.Scene();
 
-  (window.controller = controller = new Leap.Controller({
+  window.controller = controller = new Leap.Controller({
     background: true,
-    optimizeHMD: true
-  }))
-  .use('handHold', {})
-  .use('handEntry', {})
-  .use('riggedHand')
-  .connect();
+    optimizeHMD: true,
+    vr: true
+  });
+
+  controller.use('transform', {
+    quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
+    position: new THREE.Vector3(0, 100, 0)
+  });
+
+  controller.use('handHold', {});
+  controller.use('handEntry', {});
+
+  controller.use('riggedHand', {
+    parent: window.scene,
+    camera: window.camera,
+    positionScale: 2,
+    renderFn: null,
+    boneColors: function(boneMesh, leapHand) {
+      return {
+        hue: 0.6,
+        saturation: 0.2,
+        lightness: 0.8
+      };
+    }
+  });
+
+  controller.connect();
 
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
