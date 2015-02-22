@@ -31,13 +31,17 @@ function init() {
 
   window.controller = controller = new Leap.Controller({
     background: true,
-    optimizeHMD: true
+    optimizeHMD: true,
+    vr: true
   });
 
   controller.use('transform', {
     quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
     position: new THREE.Vector3(0, 100, 0)
   });
+
+  controller.use('handHold', {});
+  controller.use('handEntry', {});
 
   controller.use('riggedHand', {
     parent: window.scene,
