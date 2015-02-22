@@ -14,6 +14,9 @@ function findObjects(frame, cubes) {
     var vector = new THREE.Vector3(vpx, vpy, 0.5);
     vector.unproject(camera);
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+    console.log(camera.position);
+    console.log(vector.sub(camera.position).normalize());
+    console.log(cubes.children.length);
     intersects = raycaster.intersectObjects(cubes.children);
   };
 

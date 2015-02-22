@@ -5,8 +5,6 @@ var vrControls;
 var mouseControls;
 var headControls;
 var controller;
-var range = 50;
-var radius = 10;
 var theta = Math.PI;
 
 var mouse = new THREE.Vector2();
@@ -55,36 +53,32 @@ function init() {
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  camera.position.x = radius;
-  camera.position.y = radius;
-  camera.position.z = radius;
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.position.z = 100;
   camera.lookAt( scene.position );
 
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
 
-  var geom = new THREE.BoxGeometry( 20, 20, 20 );
+  var geom = new THREE.BoxGeometry( 50, 50, 50 );
 
   cubes = new THREE.Object3D()
 
-  for(var i = 0; i < 100; i++ ) {
+  for(var i = 0; i < 1; i++ ) {
     var grayness = Math.random() * 0.5 + 0.25;
     var mat = new THREE.MeshBasicMaterial();
     mat.color.setRGB( grayness, grayness, grayness );
     var cube = new THREE.Mesh( geom, mat );
 
-    cube.position.x = Math.random() * 800 - 400;
-    cube.position.y = Math.random() * 800 - 400;
-    cube.position.z = Math.random() * 800 - 400;
+    cube.position.x = -10;
+    cube.position.y = -10;
+    cube.position.z = -10;
 
-    cube.rotation.x = Math.random() * 2 * Math.PI;
-    cube.rotation.y = Math.random() * 2 * Math.PI;
-    cube.rotation.z = Math.random() * 2 * Math.PI;
-
-    cube.scale.x = Math.random() + 0.5;
-    cube.scale.y = Math.random() + 0.5;
-    cube.scale.z = Math.random() + 0.5;
+    cube.scale.x = 1;
+    cube.scale.y = 1;
+    cube.scale.z = 1;
 
     cube.grayness = grayness; // *** NOTE THIS
     cubes.add(cube);
@@ -108,7 +102,8 @@ function init() {
     control.panFingers     = [6, 12];
     control.panRightHanded = false; // for left-handed person
 
-    controls.push(control);
+    controls[cube.id] = control;
+    console.log(controls);
   }
 
   scene.add(cubes)
