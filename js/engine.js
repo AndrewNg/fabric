@@ -25,7 +25,7 @@ function init() {
   info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
   container.appendChild( info );
 
-  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
 
   scene = new THREE.Scene();
 
@@ -35,36 +35,24 @@ function init() {
     vr: true
   });
 
-  controller.use('transform', {
-    quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
-    position: new THREE.Vector3(0, 100, 0)
-  });
+  // controller.use('transform', {
+  //   quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
+  //   position: new THREE.Vector3(0, 100, 0)
+  // });
 
-  controller.use('handHold', {});
-  controller.use('handEntry', {});
-
-  controller.use('riggedHand', {
-    parent: window.scene,
-    camera: window.camera,
-    positionScale: 2,
-    renderFn: null,
-    boneColors: function(boneMesh, leapHand) {
-      return {
-        hue: 0.6,
-        saturation: 0.2,
-        lightness: 0.8
-      };
-    }
+  controller.use('boneHand', {
+    scene: scene,
+    arm: true
   });
 
   controller.connect();
 
-  var trackHand = function(hand){
-    var handMesh = hand.data('riggedHand.mesh');
-    console.log(handMesh.position.x);
-  };
+  // var trackHand = function(hand){
+  //   var handMesh = hand.data('riggedHand.mesh');
+  //   console.log(handMesh.position.x);
+  // };
 
-  controller.on('hand', trackHand);
+  // controller.on('hand', trackHand);
 
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
@@ -72,25 +60,25 @@ function init() {
 
   var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-  for ( var i = 0; i < 2000; i ++ ) {
+  var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-    var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+  object.position.x = 0;
+  object.position.y = 0;
+  object.position.z = 0;
 
-    object.position.x = Math.random() * 800 - 400;
-    object.position.y = Math.random() * 800 - 400;
-    object.position.z = Math.random() * 800 - 400;
+  object.rotation.x = Math.PI;
+  object.rotation.y = Math.PI;
+  object.rotation.z = Math.PI;
 
-    object.rotation.x = Math.random() * 2 * Math.PI;
-    object.rotation.y = Math.random() * 2 * Math.PI;
-    object.rotation.z = Math.random() * 2 * Math.PI;
+  scene.add( object );
 
-    object.scale.x = Math.random() + 0.5;
-    object.scale.y = Math.random() + 0.5;
-    object.scale.z = Math.random() + 0.5;
+  theta = Math.PI;
 
-    scene.add( object );
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.position.z = -100;
+  camera.lookAt( scene.position );
 
-  }
 
   raycaster = new THREE.Raycaster();
 
@@ -177,14 +165,6 @@ function animate() {
 }
 
 function render() {
-
-  theta += 0.1;
-
-  camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-  camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-  camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-  camera.lookAt( scene.position );
-
   camera.updateMatrixWorld();
 
   // find intersections
