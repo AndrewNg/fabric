@@ -19,8 +19,8 @@ function findObjects(frame, cubes) {
     console.log(cubes.children.length);
     intersects = raycaster.intersectObjects(cubes.children);
 
-    if(pinchStrength > 0.5){
-      init.morphVertex(0, pinchStrength);
+    if(pinchStrength > 0.3){
+      init.rotateObject(1);
     }
   };
 
