@@ -18,6 +18,7 @@ var prevPointable = null;
 
 init();
 animate();
+addKeyObjects();
 
 var highlightObject = function(object) {
   object.material.color.setHex(0xff0000);
@@ -162,72 +163,7 @@ function init() {
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
 
-  var geom = new THREE.BoxGeometry( 50, 50, 50 );
-
-  cubes = new THREE.Object3D();
-
-  for(var i = 0; i < 1; i++ ) {
-    var grayness = Math.random() * 0.5 + 0.25;
-    var mat = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
-    mat.color.setRGB( grayness, grayness, grayness );
-    
-    for ( var i = 0; i < geom.vertices.length; i ++ ) {
-
-      var vertices = [];
-
-      for ( var v = 0; v < geom.vertices.length; v ++ ) {
-
-        vertices.push( geom.vertices[ v ].clone() );
-
-        if ( v === i ) {
-
-          vertices[ vertices.length - 1 ].x *= 2;
-          vertices[ vertices.length - 1 ].y *= 2;
-          vertices[ vertices.length - 1 ].z *= 2;
-
-        }
-
-      }
-
-      geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
-
-    }
-    var cube = new THREE.Mesh( geom, mat );
-
-    cube.position.x = -25;
-    cube.position.y = -25;
-    cube.position.z = -25;
-
-    cube.scale.x = 1;
-    cube.scale.y = 1;
-    cube.scale.z = 1;
-
-    cube.grayness = grayness; // *** NOTE THIS
-    cubes.add(cube);
-
-    // leap object controls
-    var control = new THREE.LeapObjectControls(camera, cube)
-
-    control.rotateEnabled  = true;
-    control.rotateSpeed    = 3;
-    control.rotateHands    = 1;
-    control.rotateFingers  = [2, 3];
-
-    control.scaleEnabled   = true;
-    control.scaleSpeed     = 3;
-    control.scaleHands     = 1;
-    control.scaleFingers   = [4, 5];
-
-    control.panEnabled     = true;
-    control.panSpeed       = 3;
-    control.panHands       = 2;
-    control.panFingers     = [6, 12];
-    control.panRightHanded = false; // for left-handed person
-
-    controls[cube.id] = control;
-  }
-
-  scene.add(cubes)
+  addObject(4);
 
   initLeapMotion();
 
