@@ -67,6 +67,12 @@ function transform(tipPosition, w, h) {
   return [x, y];
 };
 
+function translateObject(obj, vector){
+  obj.translateX(vector.x);
+  obj.translateY(vector.y);
+  obj.translateZ(vector.z);
+}
+
 var morphVertex = function(obj, vertex, val){
   obj.morphTargetInfluences[vertex] = val;
 }
