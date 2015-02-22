@@ -9,14 +9,11 @@ function findObjects(frame, cubes) {
     var f = frame.pointables[0];
     var cont = $(renderer.domElement);
     var coords = transform(f.tipPosition, cont.width(), cont.height());
-    var vpx = (coords[0]/cont.width())*2 - 1;
-    var vpy = -(coords[1]/cont.height())*2 + 1;
-    var vector = new THREE.Vector3(vpx, vpy, 0.5);
-    vector.unproject(camera);
-    var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-    console.log(camera.position);
-    console.log(vector.sub(camera.position).normalize());
-    console.log(cubes.children.length);
+    var vector = new THREE.Vector3();
+    vector.x = (coords[0]/cont.width())*2 - 1;
+    vector.y = 1 - (coords[1]/cont.height())*2;
+    var raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera( vector.clone(), camera ); 
     intersects = raycaster.intersectObjects(cubes.children);
   };
 
@@ -24,15 +21,15 @@ function findObjects(frame, cubes) {
 };
 
 function transform(tipPosition, w, h) {
-  var width = 150;
-  var height = 150;
-  var minHeight = 100;
+  var width = 0.2;
+  var maxHeight = 0.2;
+  var minHeight = -0.4;
 
   var ftx = tipPosition[0];
   var fty = tipPosition[1];
-  ftx = (ftx > width ? width - 1 : (ftx < -width ? -width + 1 : ftx));
-  fty = (fty > 2*height ? 2*height - 1 : (fty < minHeight ? minHeight + 1 : fty));
+  ftx = (ftx > width ? width - 0.001 : (ftx < -width ? -width + 0.001 : ftx));
+  fty = (fty > maxHeight ? maxHeight - 0.001 : (fty < minHeight ? minHeight + 0.001 : fty));
   var x = THREE.Math.mapLinear(ftx, -width, width, 0, w);
-  var y = THREE.Math.mapLinear(fty, 2*height, minHeight, 0, h);
+  var y = THREE.Math.mapLinear(fty, minHeight, maxHeight, 0, h);
   return [x, y];
 };

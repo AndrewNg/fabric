@@ -38,7 +38,6 @@ function initLeapMotion() {
     }
     for (var i = 0; i < intersects.length; i++) {
       var obj = intersects[i].object;
-      console.log(obj);
       obj.material.color.setHex(0xff0000);
       controls[obj.id].update(frame);
     }
@@ -58,6 +57,16 @@ function init() {
   camera.position.z = 100;
   camera.lookAt( scene.position );
 
+  // world coordinate system (thin dashed helping lines)
+  var origin = new THREE.Vector3(0, 0, 0);
+  var lineGeometry = new THREE.Geometry();
+  var vertArray = lineGeometry.vertices;
+  vertArray.push(new THREE.Vector3(1000, 0, 0), origin, new THREE.Vector3(0, 1000, 0), origin, new THREE.Vector3(0, 0, 1000));
+  lineGeometry.computeLineDistances();
+  var lineMaterial = new THREE.LineDashedMaterial({color: 0xcccccc, dashSize: 1, gapSize: 2});
+  var coords = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(coords);
+
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
@@ -72,9 +81,9 @@ function init() {
     mat.color.setRGB( grayness, grayness, grayness );
     var cube = new THREE.Mesh( geom, mat );
 
-    cube.position.x = -10;
-    cube.position.y = -10;
-    cube.position.z = -10;
+    cube.position.x = -25;
+    cube.position.y = -25;
+    cube.position.z = -25;
 
     cube.scale.x = 1;
     cube.scale.y = 1;
@@ -103,7 +112,6 @@ function init() {
     control.panRightHanded = false; // for left-handed person
 
     controls[cube.id] = control;
-    console.log(controls);
   }
 
   scene.add(cubes)
