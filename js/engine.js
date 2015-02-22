@@ -32,7 +32,11 @@ function init() {
   (window.controller = controller = new Leap.Controller({
     background: true,
     optimizeHMD: true
-  })).use('riggedHand').connect();
+  }))
+  .use('handHold', {})
+  .use('handEntry', {})
+  .use('riggedHand')
+  .connect();
 
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
