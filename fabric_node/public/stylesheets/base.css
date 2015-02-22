@@ -7,6 +7,12 @@ body{
   border-top:5px solid #a3cddd;
 }
 
+.oculus-menu{
+  position: absolute;
+  margin-top:-30px;
+  
+}
+
 .bottomborder{
   background: url("../images/border.png");
   width: 100%;
