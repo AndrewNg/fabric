@@ -1,5 +1,13 @@
 var projector = new THREE.Projector();
 var containerDepth = 200;
+var objectCollection;
+
+function morph(frame, object, prev) {
+  console.log('checking morph');
+  // if(pinchStrength > 0.3){
+  //   morphVertex(object, 0, 1);
+  // }
+}
 
 function scale(frame, object, prev) {
   var hl = frame.hands.length;
@@ -18,6 +26,8 @@ function scale(frame, object, prev) {
     scaleObject(object, k);
     console.log(object.scale);
     console.log(k);
+    console.log(toZ);
+    console.log(fromZ);
     return true;
   }
 
@@ -76,10 +86,6 @@ function selector(frame, cubes) {
     var raycaster = new THREE.Raycaster();
     raycaster.setFromCamera( vector.clone(), camera ); 
     intersects = raycaster.intersectObjects(cubes.children);
-
-    if(pinchStrength > 0.3){
-      // init.rotateCamera();
-    }
   };
 
   return intersects;
