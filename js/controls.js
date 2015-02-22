@@ -17,7 +17,7 @@ function findObjects(frame, cubes) {
     intersects = raycaster.intersectObjects(cubes.children);
 
     if(pinchStrength > 0.3){
-      init.cameraZoom();
+      // init.rotateCamera();
     }
   };
 
