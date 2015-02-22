@@ -181,11 +181,11 @@ function addObject(objectNum){
   destroyPrevObject();
 
   var possibilities = [
-    new THREE.BoxGeometry( 50, 50, 50 ),
-    new THREE.CylinderGeometry( 5, 5, 20, 32 ),
-    new THREE.DodecahedronGeometry( 10, 0 ),
-    new THREE.IcosahedronGeometry( 10, 0 ),
-    new THREE.OctahedronGeometry( 10, 0 ),
+    new THREE.BoxGeometry( 70, 70, 70 ),
+    new THREE.CylinderGeometry( 5, 5, 70, 50 ),
+    new THREE.DodecahedronGeometry( 70, 0 ),
+    new THREE.IcosahedronGeometry( 70, 0 ),
+    new THREE.OctahedronGeometry( 70, 0 ),
     new THREE.PolyhedronGeometry( 
     [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
@@ -200,9 +200,9 @@ function addObject(objectNum){
       4,5,6,    6,7,4
     ], 
     6, 2 ),
-    new THREE.SphereGeometry(50, 8, 6, 0, Math.PI * 2, 0, Math.PI),
-    new THREE.RingGeometry(15, 50, 8, 8, 0, Math.PI * 2),
-    new THREE.TetrahedronGeometry(10, 0)
+    new THREE.SphereGeometry(70, 8, 6, 0, Math.PI * 2, 0, Math.PI),
+    new THREE.RingGeometry(15, 70, 8, 8, 0, Math.PI * 2),
+    new THREE.TetrahedronGeometry(70, 0)
   ];
 
   var geom = possibilities[objectNum];

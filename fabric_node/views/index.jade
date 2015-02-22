@@ -1,21 +1,67 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  .container
+    .logo
+      img(src="images/logo.svg")
+      h1 fabric
+      p your virtual world of creation
 
-  script(src="/javascripts/jquery-1.11.2.min.js")
-  script(src="/javascripts/three.min.js")
-  script(src="/javascripts/FileSaver.js")
-  script(src="/javascripts/STLFileSaver.js")
-  script(src="/javascripts/STLLoader.js")
-  script(src="/javascripts/export.js")
-  script(src="/javascripts/lib/smartcrop.js")
+    .row.showcase-row
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #1
+              p Created 5 hours ago
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #2
+              p Created 5 hours ago
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #3
+              p Created 5 hours ago
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #1
+              p Created 5 hours ago
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #2
+              p Created 5 hours ago
+      .col-md-4
+        .cool-effect
+          .art-showcase
+            .padder
+              img(src="http://placehold.it/125x125")
+              h3 Illustration #3
+              p Created 5 hours ago
 
-  // img#image(src="/javascripts/0.png")
+script(src="/javascripts/jquery-1.11.2.min.js")
+script(src="/javascripts/three.min.js")
+script(src="/javascripts/FileSaver.js")
+script(src="/javascripts/STLFileSaver.js")
+script(src="/javascripts/STLLoader.js")
+script(src="/javascripts/export.js")
+script(src="/javascripts/lib/smartcrop.js")
 
-  script.
-    //- var image = document.getElementById(image);
-    //- SmartCrop.crop(image, {width: 100, height: 100}, function(result){console.log(result);});
 
+img#image(src="/javascripts/0.png")
 
+script.
+  var image = document.getElementById(image);
+  SmartCrop.crop(image, {width: 100, height: 100}, function(result){console.log(result);});
