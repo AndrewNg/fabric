@@ -94,7 +94,10 @@ function initLeapMotion() {
     else {
       var obj = selects[0].object;
       if (selected != null && selected.id != obj.id) {
-        unHighlightObject(selected);
+        var objs = objectCollection.children;
+        for(var i = 0; i < objs.length; i++){
+          unHighlightObject(objs[i]);
+        }
       }
       // if multiple selected, this will have to be a loop
       selected = obj;
@@ -142,9 +145,7 @@ function init() {
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  camera.position.x = 0;
-  camera.position.y = 0;
-  camera.position.z = 100;
+  camera.position.set(0, 0, 100);
   camera.lookAt( scene.position );
 
   // world coordinate system (thin dashed helping lines)
@@ -161,7 +162,10 @@ function init() {
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
 
-  addObject(4);
+  // for (var i = 0; i < 10; i++) {
+  //   addObject(9);
+  // }
+  addObject(0);
 
   initLeapMotion();
 

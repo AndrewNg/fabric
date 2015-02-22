@@ -1,6 +1,6 @@
 var projector = new THREE.Projector();
 var containerDepth = 200;
-var objectCollection;
+var objectCollection = new THREE.Object3D();;
 
 var distBetween = function(v, vector) {
 
@@ -10,9 +10,6 @@ function morph(frame, object, prev, pinchStrength) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
 
-  console.log('checking morph');
-  console.log(hl);
-  console.log(fl);
   if(hl == 1 && fl == 2){
     var cont = $(renderer.domElement);
     var fromCoords = transform(prev, cont.width(), cont.height());
@@ -33,12 +30,12 @@ function morph(frame, object, prev, pinchStrength) {
     //     bestVertex = vertices[i];
     //   }
     // }
-    console.log('morphing vertex: ');
-    console.log(bestVertex);
-    console.log(bestIndex);
-    console.log(vector.length());
+    // console.log('morphing vertex: ');
+    // console.log(bestVertex);
+    // console.log(bestIndex);
+    // console.log(vector.length());
 
-    var multiplier = 0.02;
+    var multiplier = 0.005;
     if (fromCoords[0] > toCoords[0]) {
       multiplier *= -1;
     }
@@ -62,7 +59,7 @@ function scale(frame, object, prev) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
 
-  if (hl == 1 && fl == 4 && prev != null) {
+  if (hl == 1 && fl == 5 && prev != null) {
     var cont = $(renderer.domElement);
     var fromZ = transform(prev, cont.width(), cont.height())[2];
     var f = frame.pointables[0];
@@ -70,13 +67,13 @@ function scale(frame, object, prev) {
 
     var k = Math.pow(2, (toZ - fromZ) / 50);
   
-    console.log("scale object from: to: using: ");
-    console.log(object.scale);
+    // console.log("scale object from: to: using: ");
+    // console.log(object.scale);
     scaleObject(object, k);
-    console.log(object.scale);
-    console.log(k);
-    console.log(toZ);
-    console.log(fromZ);
+    // console.log(object.scale);
+    // console.log(k);
+    // console.log(toZ);
+    // console.log(fromZ);
     return true;
   }
 
@@ -96,11 +93,11 @@ function translation(frame, object, prev) {
 
     var vector = new THREE.Vector3(toCoords[0] - fromCoords[0], toCoords[1] - fromCoords[1], toCoords[2] - fromCoords[2]);
   
-    console.log("translate object from: to: using: ");
-    console.log(object.position);
-    translateObject(object, vector.normalize().multiplyScalar(5));
-    console.log(object.position);
-    console.log(vector.normalize().multiplyScalar(5));
+    //console.log("translate object from: to: using: ");
+    //console.log(object.position);
+    translateObject(object, vector.normalize().multiplyScalar(2));
+    // console.log(object.position);
+    // console.log(vector.normalize().multiplyScalar(5));
     return true;
   }
 
@@ -111,11 +108,11 @@ function rotation(frame, object, prev) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
 
-  // if (hl == 1 && fl == 4 && prev != null) {
-  //   console.log("rotation");
-  //   rotateObject(object, 2);
-  //   return true;
-  // }
+  if (hl == 1 && fl == 4 && prev != null) {
+    // console.log("rotation");
+    rotateObject(object, 2);
+    return true;
+  }
 
   return false;
 }
@@ -128,10 +125,13 @@ function selector(frame, cubes) {
   if (hl == 1 && fl == 1) {
     var f = frame.pointables[0];
     var cont = $(renderer.domElement);
+    conton = cont;
     var coords = transform(f.tipPosition, cont.width(), cont.height());
     var vector = new THREE.Vector3();
     vector.x = (coords[0]/cont.width())*2 - 1;
-    vector.y = 1 - (coords[1]/cont.height())*2;
+    vector.y = (coords[1]/cont.height())*2 - 1;
+
+    //console.log(coords);
     var raycaster = new THREE.Raycaster();
     raycaster.setFromCamera( vector.clone(), camera ); 
     intersects = raycaster.intersectObjects(cubes.children);
@@ -223,7 +223,7 @@ function destroyPrevObject(){
 };
 
 function addObject(objectNum){
-  destroyPrevObject();
+  // destroyPrevObject();
 
   var possibilities = [
     new THREE.BoxGeometry( 70, 70, 70 ),
@@ -247,12 +247,12 @@ function addObject(objectNum){
     6, 2 ),
     new THREE.SphereGeometry(70, 8, 6, 0, Math.PI * 2, 0, Math.PI),
     new THREE.RingGeometry(15, 70, 8, 8, 0, Math.PI * 2),
-    new THREE.TetrahedronGeometry(70, 0)
+    new THREE.TetrahedronGeometry(70, 0),
+    new THREE.BoxGeometry( 15, 15, 15 )
+
   ];
 
   var geom = possibilities[objectNum];
-
-  objectCollection = new THREE.Object3D();
 
   for(var i = 0; i < 1; i++ ) {
     var grayness = Math.random() * 0.5 + 0.25;
@@ -282,13 +282,13 @@ function addObject(objectNum){
     }
     var collectionItem = new THREE.Mesh( geom, mat );
 
-    collectionItem.position.x = -25;
-    collectionItem.position.y = -25;
-    collectionItem.position.z = -25;
+    collectionItem.position.x = Math.random()* -100 + 50;
+    collectionItem.position.y = Math.random()* -100 + 50;
+    collectionItem.position.z = Math.random()* -100 + 50;
 
-    collectionItem.scale.x = 1;
-    collectionItem.scale.y = 1;
-    collectionItem.scale.z = 1;
+    collectionItem.scale.x = Math.random() + 0.5;
+    collectionItem.scale.y = Math.random() + 0.5;
+    collectionItem.scale.z = Math.random() + 0.5;
 
     collectionItem.grayness = grayness; // *** NOTE THIS
     objectCollection.add(collectionItem);
