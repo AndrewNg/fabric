@@ -1,199 +1,155 @@
-var container, stats;
-var camera, scene, raycaster, renderer;
-var vrEffect;
-var vrControls;
-var mouseControls;
-var headControls;
-var controller;
-
-var mouse = new THREE.Vector2(), INTERSECTED;
-var radius = 100, theta = 0;
-
-init();
-animate();
-
-function init() {
-
-  container = document.createElement( 'div' );
-  document.body.appendChild( container );
-
-  var info = document.createElement( 'div' );
-  info.style.position = 'absolute';
-  info.style.top = '10px';
-  info.style.width = '100%';
-  info.style.textAlign = 'center';
-  info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
-  container.appendChild( info );
-
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-
-  scene = new THREE.Scene();
-
-  window.controller = controller = new Leap.Controller({
-    background: true,
-    optimizeHMD: true,
-    vr: true
-  });
-
-  // controller.use('transform', {
-  //   quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
-  //   position: new THREE.Vector3(0, 100, 0)
-  // });
-
-  controller.use('boneHand', {
-    scene: scene,
-    arm: true
-  });
-
-  controller.connect();
-
-  // var trackHand = function(hand){
-  //   var handMesh = hand.data('riggedHand.mesh');
-  //   console.log(handMesh.position.x);
-  // };
-
-  // controller.on('hand', trackHand);
-
-  var light = new THREE.DirectionalLight( 0xffffff, 1 );
-  light.position.set( 1, 1, 1 ).normalize();
-  scene.add( light );
-
-  var geometry = new THREE.BoxGeometry( 20, 20, 20 );
-
-  var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-
-  object.position.x = 0;
-  object.position.y = 0;
-  object.position.z = 0;
-
-  object.rotation.x = Math.PI;
-  object.rotation.y = Math.PI;
-  object.rotation.z = Math.PI;
-
-  scene.add( object );
-
-  theta = Math.PI;
-
-  camera.position.x = 0;
-  camera.position.y = 0;
-  camera.position.z = -100;
-  camera.lookAt( scene.position );
-
-
-  raycaster = new THREE.Raycaster();
-
-  renderer = new THREE.WebGLRenderer( { antialias: true } );
-  renderer.setPixelRatio( window.devicePixelRatio );
-
-  var fullScreenButton = document.querySelector( '.full-screen' );
-  var mouseLookButton = document.querySelector( '.mouse-look' );
-  var mouseLook = false;
-
-  fullScreenButton.onclick = function() {
-    vrEffect.setFullScreen( true );
-  };
-
-  vrControls = new THREE.VRControls(camera);
-  mouseControls = new THREE.MouseControls(camera);
-  headControls = vrControls;
-
-  mouseLookButton.onclick = function() {
-    mouseLook = !mouseLook;
-
-    if (mouseLook) {
-      headControls = mouseControls;
-      mouseLookButton.classList.add('enabled');
-    } else {
-      headControls = vrControls;
-      mouseLookButton.classList.remove('enabled');
-    }
-  }
-
-  vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
-  function VREffectLoaded(error) {
-    if (error) {
-      fullScreenButton.innerHTML = error;
-      fullScreenButton.classList.add('error');
-    }
-  }
-
-  renderer.setClearColor( 0xf0f0f0 );
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.sortObjects = false;
-  container.appendChild( renderer.domElement );
-
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.top = '0px';
-  container.appendChild( stats.domElement );
-
-  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  // Including this in the footer so that the bone hand plugin can create its canvas on the body
 
   //
+  // CREATE THE SCENE
+  //
+  //
 
-  window.addEventListener( 'resize', onWindowResize, false );
+  var scene = new THREE.Scene();
 
-}
+  var camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    10000
+  );
 
-function onWindowResize() {
+  var canvas = document.getElementById('scene');
+  canvas.style.position = 'absolute';
+  canvas.style.top = 0;
+  canvas.style.left = 0;
 
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  var renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    canvas: canvas
+  });
 
-  vrEffect.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-}
+  onResize = function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+  window.addEventListener('resize', onResize, false);
 
-function onDocumentMouseMove( event ) {
 
-  event.preventDefault();
+  var light = new THREE.PointLight(0xffffff, 1, 1000);
+  scene.add(light);
 
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-}
+  //
+  // ADD CUBES (blah blah)
+  //
+  //
 
-//
+  var cubeGeo = new THREE.BoxGeometry(0.032, 0.032, 0.032);
+  var cubeMesh = new THREE.MeshPhongMaterial({color: 0x00cc00});
 
-function animate() {
+  // forwards
+  var cube = new THREE.Mesh(cubeGeo, cubeMesh);
+  cube.position.set(-0.06,-0.03,-0.3);
+  scene.add(cube);
 
-  requestAnimationFrame( animate );
+  //
+  // ADD LEAP MOTION
+  //
+  //
+
+  // Connect to localhost and start getting frames
+  Leap.loop();
+
+  // Docs: http://leapmotion.github.io/leapjs-plugins/main/transform/
+  Leap.loopController.use('transform', {
+
+    // This matrix flips the x, y, and z axis, scales to meters, and offsets the hands by -8cm.
+    vr: true,
+
+    // This causes the camera's matrix transforms (position, rotation, scale) to be applied to the hands themselves
+    // The parent of the bones remain the scene, allowing the data to remain in easy-to-work-with world space.
+    // (As the hands will usually interact with multiple objects in the scene.)
+    effectiveParent: camera
+
+  });
+
+  // Docs: http://leapmotion.github.io/leapjs-plugins/main/bone-hand/
+  Leap.loopController.use('boneHand', {
+
+    // If you already have a scene or want to create it yourself, you can pass it in here
+    // Alternatively, you can pass it in whenever you want by doing
+    // Leap.loopController.plugins.boneHand.scene = myScene.
+    scene: scene,
+
+    // Display the arm
+    arm: true
+
+  });
+
+
+
+  //
+  // ADD VIRTUAL REALITY
+  //
+  //
+
+  // Moves (translates and rotates) the camera
+  var vrControls = new THREE.VRControls(camera);
+
+  var vrEffect = new THREE.VREffect(renderer);
+
+
+  var onkey = function(event) {
+    if (event.key === 'z') {
+      vrControls.zeroSensor();
+    }
+    if (event.key === 'f') {
+      return vrEffect.setFullScreen(true);
+    }
+  };
+
+  window.addEventListener("keypress", onkey, true);
+
+
+
+  //
+  // MAKE IT GO
+  //
+  //
+
+  var render = function() {
+    vrControls.update();
+    vrEffect.render(scene, camera);
+
+    requestAnimationFrame(render);
+  };
 
   render();
-  stats.update();
 
-}
 
-function render() {
-  camera.updateMatrixWorld();
+  //
+  // Add a debug message Real quick
+  // Prints out when receiving oculus data.
+  //
+  //
 
-  // find intersections
+  var receivingPositionalData = false;
+  var receivingOrientationData = false;
 
-  raycaster.setFromCamera( mouse, camera );
+  var timerID = setInterval(function(){
 
-  var intersects = raycaster.intersectObjects( scene.children );
-
-  if ( intersects.length > 0 ) {
-
-    if ( INTERSECTED != intersects[ 0 ].object ) {
-
-      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-      INTERSECTED = intersects[ 0 ].object;
-      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-      INTERSECTED.material.emissive.setHex( 0xff0000 );
-
+    if (camera.position.x !== 0 && !receivingPositionalData){
+      receivingPositionalData = true;
+      console.log("receiving positional data");
     }
 
-  } else {
+    if (camera.quaternion.x !== 0 && !receivingOrientationData){
+      receivingOrientationData = true;
+      console.log("receiving orientation data");
+    }
 
-    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+    if (receivingOrientationData && receivingPositionalData){
+      clearInterval(timerID);
+    }
 
-    INTERSECTED = null;
+  }, 2000);
 
-  }
-
-  headControls.update();
-  vrEffect.render( scene, camera );
-
-}
