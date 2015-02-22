@@ -11,10 +11,32 @@ var handPosition = [];
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
-var cube;
+var selected = null;
+var lastSelected = null;
+var timer;
+var prevPointable = null;
 
 init();
 animate();
+
+var highlightObject = function(object) {
+  object.material.color.setHex(0xff0000);
+};
+
+var unHighlightObject = function(object) {
+  var grayness = object.grayness
+  object.material.color.setRGB(grayness,grayness,grayness);
+};
+
+var setPrevPointable = function(frame){
+  var f = frame.pointables[0];
+  if (typeof f == "undefined") {
+    prevPointable = null;
+  }
+  else {
+    prevPointable = f.tipPosition;
+  } 
+}
 
 // leap motion controller
 function initLeapMotion() { 
@@ -33,26 +55,54 @@ function initLeapMotion() {
   });
 
   controller.on('frame', function(frame){
-    var intersects = findObjects(frame, cubes);
-    for (var i = 0; i < cubes.children.length; i++) {
-      var grayness = cubes.children[i].grayness
-      cubes.children[i].material.color.setRGB(grayness, grayness, grayness );
+    if (prevPointable == null) {
+      setPrevPointable(frame);
     }
-    for (var i = 0; i < intersects.length; i++) {
-      var obj = intersects[i].object;
-      obj.material.color.setHex(0xff0000);
-      controls[obj.id].update(frame);
+    var selects = selector(frame, cubes);
+    if (selects.length == 0) {
+      if (selected != null) {
+        unHighlightObject(selected);
+        lastSelected = selected;
+        selected = null;
+
+        console.log('initial start timer');
+        timer = new Stopwatch();
+        timer.start();
+      }
+    }
+    else {
+      var obj = selects[0].object;
+      if (selected != null && selected.id != obj.id) {
+        unHighlightObject(selected);
+      }
+      // if multiple selected, this will have to be a loop
+      selected = obj;
+      highlightObject(selected);
     }
 
-    var hl = frame.hands.length;
-    var fl = frame.fingers.filter(function(f){return f.extended}).length;
-
-    if (hl == 1 && fl == 1) {
-      var f = frame.pointables[0];
-      var cont = $(renderer.domElement);
-      var coords = transform(f.tipPosition, cont.width(), cont.height());
-      handPosition = coords;
+    if (lastSelected != null) {
+      if (timer.lap() <= 250) {
+        selected = lastSelected; 
+        highlightObject(selected);
+        if (translation(frame, selected, prevPointable) || 
+            rotation(frame, selected, prevPointable) || 
+            scale(frame, selected, prevPointable)) {
+          timer = new Stopwatch();
+          timer.start();
+        }
+        else {
+          unHighlightObject(selected);
+          selected = null;
+        }
+      }
+      else {
+        unHighlightObject(lastSelected);
+        lastSelected = null;
+        timer.end();
+      }
     }
+
+    setPrevPointable(frame);
   });
 
   var getPinchStrength = function(hand){
@@ -119,7 +169,7 @@ function init() {
       geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
 
     }
-    cube = new THREE.Mesh( geom, mat );
+    var cube = new THREE.Mesh( geom, mat );
 
     cube.position.x = -25;
     cube.position.y = -25;
@@ -131,59 +181,6 @@ function init() {
 
     cube.grayness = grayness; // *** NOTE THIS
     cubes.add(cube);
-
-    var morphVertex = function(vertex, val){
-      cube.morphTargetInfluences[vertex] = val;
-    }
-
-    var scaleObject = function(val){
-      cube.scale.set(val,val,val);
-    }
-
-    var rotateObject = function(axis){
-      var rotObjectMatrix;
-      function rotateAroundObjectAxis(object, axis, radians) {
-          rotObjectMatrix = new THREE.Matrix4();
-          rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-
-          object.matrix.multiply(rotObjectMatrix);
-
-          object.rotation.setFromRotationMatrix(object.matrix);
-      }
-
-      var rotWorldMatrix;
-      // Rotate an object around an arbitrary axis in world space       
-      function rotateAroundWorldAxis(object, axis, radians) {
-          rotWorldMatrix = new THREE.Matrix4();
-          rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-
-          rotWorldMatrix.multiply(object.matrix);
-
-          object.matrix = rotWorldMatrix;
-          object.rotation.setFromRotationMatrix(object.matrix);
-      }
-
-      // x axis, y axis, and z axis
-      var axes = [(new THREE.Vector3(1,0,0)), (new THREE.Vector3(0,1,0)), (new THREE.Vector3(0,0,1))];
-
-      rotateAroundWorldAxis(cube, axes[axis], Math.PI / 180);
-    }
-
-    var cameraZoom = function(){
-      var zoomFactor = 1.0, inc = 0.1; 
-      while(zoomFactor < 2){
-        // setTimeout(function(){
-        //   camera.fov *= zoomFactor;
-        //   camera.updateProjectionMatrix();
-        //   zoom += inc;
-        // }, 10);
-      }
-    }
-
-    init.morphVertex = morphVertex;
-    init.scaleObject = scaleObject;
-    init.rotateObject = rotateObject;
-    init.cameraZoom = cameraZoom;
 
     // leap object controls
     var control = new THREE.LeapObjectControls(camera, cube)
@@ -298,4 +295,22 @@ function render() {
   
   headControls.update();
   vrEffect.render( scene, camera );
+}
+
+Stopwatch = function() {
+  this.startMilliseconds = 0;
+  this.elapsedMilliseconds = 0;
+}
+
+Stopwatch.prototype.start = function() {
+  this.startMilliseconds = new Date().getTime();
+}
+
+Stopwatch.prototype.lap = function() {
+  return new Date().getTime() - this.startMilliseconds;
+}
+
+Stopwatch.prototype.end = function() {
+  this.elapsedMilliseconds = new Date().getTime() - this.startMilliseconds;
+  this.startMilliseconds = 0;
 }
