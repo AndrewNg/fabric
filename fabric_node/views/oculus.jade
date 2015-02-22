@@ -1,9 +1,9 @@
 extends layout
 
 block content
-  .menu
-    .button.mouse-look Enable Mouse Look
-    .button.full-screen Start VR Mode
+  .menu.oculus-menu
+    .btn.btn-primary.mouse-look Enable Mouse Look
+    .btn.btn-primary.full-screen Start VR Mode
   script(src='/javascripts/lib/three.min.js')
   script(src='/javascripts/vr/MouseControls.js')
   script(src='/javascripts/vr/VREffect.js')

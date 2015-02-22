@@ -34,7 +34,7 @@ var setPrevPointable = function(frame){
   }
   else {
     prevPointable = f.tipPosition;
-  } 
+  }
 }
 
 // myo init
@@ -58,10 +58,10 @@ function initMyo() {
   hub.on('disconnect', function() {
       console.log("myo disconnect");
   });
-} 
+}
 
 // leap motion controller
-function initLeapMotion() { 
+function initLeapMotion() {
   window.controller = controller = new Leap.Controller({
     background: true
   });
@@ -103,7 +103,7 @@ function initLeapMotion() {
 
     if (lastSelected != null) {
       if (timer.lap() <= 250) {
-        selected = lastSelected; 
+        selected = lastSelected;
         highlightObject(selected);
         if (translation(frame, selected, prevPointable) || 
             rotation(frame, selected, prevPointable) || 
@@ -167,7 +167,7 @@ function init() {
 
   initMyo();
 
-  renderer = new THREE.WebGLRenderer( { antialias: true } );
+  renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true } );
   renderer.setPixelRatio( window.devicePixelRatio );
 
   var fullScreenButton = document.querySelector( '.full-screen' );
@@ -251,7 +251,7 @@ function animate() {
 
 function render() {
   camera.updateMatrixWorld();
-  
+
   headControls.update();
   vrEffect.render( scene, camera );
 }
