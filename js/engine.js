@@ -5,8 +5,9 @@ var vrControls;
 var mouseControls;
 var headControls;
 var controller;
-var containerWidth, containerHeight;
 var range = 50;
+var radius = 10;
+var theta = Math.PI;
 
 var mouse = new THREE.Vector2();
 var cubes;
@@ -32,13 +33,16 @@ function initLeapMotion() {
   });
 
   controller.on('frame', function(frame){
-    var index = focusObject(frame, cubes);
-    if(index != -1){
-      for (var i = 0; i < cubes.children.length; i++) {
-        cubes.children[i].material.color.setHex(0x000000);
-      }
-      cubes.children[index].material.color.setHex(0xff0000);
-      controls.update(frame);
+    var intersects = findObjects(frame, cubes);
+    for (var i = 0; i < cubes.children.length; i++) {
+      var grayness = cubes.children[i].grayness
+      cubes.children[i].material.color.setRGB(grayness, grayness, grayness );
+    }
+    for (var i = 0; i < intersects.length; i++) {
+      var obj = intersects[i].object;
+      console.log(obj);
+      obj.material.color.setHex(0xff0000);
+      controls[obj.id].update(frame);
     }
   });
 
@@ -48,26 +52,40 @@ function initLeapMotion() {
 function init() {
   container = document.createElement( 'div' )
   document.body.appendChild( container );
-  
-  containerWidth = container.clientWidth;
-  containerHeight = container.clientHeight;
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 45, containerWidth / containerHeight, 1, 10000 );
-  camera.position.set( 0, 0, range * 2 );
-  camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera.position.x = radius;
+  camera.position.y = radius;
+  camera.position.z = radius;
+  camera.lookAt( scene.position );
 
-  geom = new THREE.CubeGeometry( 5, 5, 5 );
+  var light = new THREE.DirectionalLight( 0xffffff, 1 );
+  light.position.set( 1, 1, 1 ).normalize();
+  scene.add( light );
 
-  cubes = new THREE.Object3D();
+  var geom = new THREE.BoxGeometry( 20, 20, 20 );
+
+  cubes = new THREE.Object3D()
 
   for(var i = 0; i < 100; i++ ) {
-    var grayness = Math.random() * 0.5 + 0.25,
-            mat = new THREE.MeshBasicMaterial(),
-            cube = new THREE.Mesh( geom, mat );
+    var grayness = Math.random() * 0.5 + 0.25;
+    var mat = new THREE.MeshBasicMaterial();
     mat.color.setRGB( grayness, grayness, grayness );
-    cube.position.set( range * (0.5 - Math.random()), range * (0.5 - Math.random()), range * (0.5 - Math.random()) );
-    cube.rotation.set( Math.random(), Math.random(), Math.random() ).multiplyScalar( 2 * Math.PI );
+    var cube = new THREE.Mesh( geom, mat );
+
+    cube.position.x = Math.random() * 800 - 400;
+    cube.position.y = Math.random() * 800 - 400;
+    cube.position.z = Math.random() * 800 - 400;
+
+    cube.rotation.x = Math.random() * 2 * Math.PI;
+    cube.rotation.y = Math.random() * 2 * Math.PI;
+    cube.rotation.z = Math.random() * 2 * Math.PI;
+
+    cube.scale.x = Math.random() + 0.5;
+    cube.scale.y = Math.random() + 0.5;
+    cube.scale.z = Math.random() + 0.5;
+
     cube.grayness = grayness; // *** NOTE THIS
     cubes.add(cube);
 
@@ -181,7 +199,7 @@ function animate() {
 
 function render() {
   camera.updateMatrixWorld();
-
+  
   headControls.update();
   vrEffect.render( scene, camera );
 }

@@ -1,11 +1,11 @@
 var projector = new THREE.Projector();
 
-function focusObject(frame, objects) {
+function findObjects(frame, cubes) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;;
+  var intersects = [];
 
   if (hl == 1 && fl == 1) {
-    console.log(camera.position);
     var f = frame.pointables[0];
     var cont = $(renderer.domElement);
     var coords = transform(f.tipPosition, cont.width(), cont.height());
@@ -14,16 +14,10 @@ function focusObject(frame, objects) {
     var vector = new THREE.Vector3(vpx, vpy, 0.5);
     vector.unproject(camera);
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-    var intersects = raycaster.intersectObjects(objects);
-    if (intersects.length > 0) {
-      var i = 0;
-      while(!intersects[i].object.visible) i++;
-      var intersected = intersects[i];
-      return objects.indexOf(intersected.object);
-    };
+    intersects = raycaster.intersectObjects(cubes.children);
   };
 
-  return -1;
+  return intersects;
 };
 
 function transform(tipPosition, w, h) {
