@@ -160,7 +160,7 @@ function init() {
       rotateAroundWorldAxis(cube, axes[axis], Math.PI / 180);
     }
 
-    var cameraZoom = function(){
+    var zoomCamera = function(){
       var zoomFactor = 1.0, inc = 0.1; 
       while(zoomFactor < 2){
         // setTimeout(function(){
@@ -171,10 +171,15 @@ function init() {
       }
     }
 
+    var rotateCamera = function(){
+      camera.rotation.y = 90 * Math.PI / 180;
+    }
+
     init.morphVertex = morphVertex;
     init.scaleObject = scaleObject;
     init.rotateObject = rotateObject;
-    init.cameraZoom = cameraZoom;
+    init.zoomCamera = zoomCamera;
+    init.rotateCamera = rotateCamera;
 
     // leap object controls
     var control = new THREE.LeapObjectControls(camera, cube)
