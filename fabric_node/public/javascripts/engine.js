@@ -6,14 +6,13 @@ var mouseControls;
 var headControls;
 var controller;
 var theta = Math.PI;
-var pinchStrength;
 var handPosition = [];
 var mouse = new THREE.Vector2();
-var controls = [];
 var selected = null;
 var lastSelected = null;
 var timer;
 var prevPointable = null;
+var pinchStrength;
 
 init();
 animate();
@@ -88,7 +87,6 @@ function initLeapMotion() {
         lastSelected = selected;
         selected = null;
 
-        console.log('initial start timer');
         timer = new Stopwatch();
         timer.start();
       }
@@ -110,7 +108,7 @@ function initLeapMotion() {
         if (translation(frame, selected, prevPointable) || 
             rotation(frame, selected, prevPointable) || 
             scale(frame, selected, prevPointable) || 
-            morph(frame, selected, prevPointable)) {
+            morph(frame, selected, prevPointable, pinchStrength)) {
           timer = new Stopwatch();
           timer.start();
         }
@@ -147,7 +145,6 @@ function init() {
   camera.position.x = 0;
   camera.position.y = 0;
   camera.position.z = 100;
-  console.log(scene.position);
   camera.lookAt( scene.position );
 
   // world coordinate system (thin dashed helping lines)
@@ -156,7 +153,7 @@ function init() {
   var vertArray = lineGeometry.vertices;
   vertArray.push(new THREE.Vector3(1000, 0, 0), origin, new THREE.Vector3(0, 1000, 0), origin, new THREE.Vector3(0, 0, 1000));
   lineGeometry.computeLineDistances();
-  var lineMaterial = new THREE.LineDashedMaterial({color: 0xcccccc, dashSize: 3, gapSize: 2});
+  var lineMaterial = new THREE.LineDashedMaterial({color: 0x000000, dashSize: 1, gapSize: 2});
   var coords = new THREE.Line(lineGeometry, lineMaterial);
   scene.add(coords);
 

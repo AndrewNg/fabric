@@ -2,11 +2,60 @@ var projector = new THREE.Projector();
 var containerDepth = 200;
 var objectCollection;
 
-function morph(frame, object, prev) {
+var distBetween = function(v, vector) {
+
+}
+
+function morph(frame, object, prev, pinchStrength) {
+  var hl = frame.hands.length;
+  var fl = frame.fingers.filter(function(f){return f.extended}).length;
+
   console.log('checking morph');
-  // if(pinchStrength > 0.3){
-  //   morphVertex(object, 0, 1);
-  // }
+  console.log(hl);
+  console.log(fl);
+  if(hl == 1 && fl == 2){
+    var cont = $(renderer.domElement);
+    var fromCoords = transform(prev, cont.width(), cont.height());
+
+    var f = frame.pointables[0];
+    var toCoords = transform(f.tipPosition, cont.width(), cont.height());
+
+    var vector = new THREE.Vector3(toCoords[0] - fromCoords[0], toCoords[1] - fromCoords[1], toCoords[2] - fromCoords[2]);
+
+    var vertices = object.geometry.vertices;
+    var bestIndex = 0;
+    var bestVertex = vertices[0];
+    var bestDist = Number.POSITIVE_INFINITY;
+    // for (int i = 0; i < vertices.length; i++) {
+    //   if (bestDist > (var d = distBetween(vertices[i], some_vector_or_line))) {
+    //     bestDist = d;
+    //     bestIndex = i;
+    //     bestVertex = vertices[i];
+    //   }
+    // }
+    console.log('morphing vertex: ');
+    console.log(bestVertex);
+    console.log(bestIndex);
+    console.log(vector.length());
+
+    var multiplier = 0.02;
+    if (fromCoords[0] > toCoords[0]) {
+      multiplier *= -1;
+    }
+
+
+    morphVertex(object, bestIndex, vector.length() * multiplier);
+    return true;
+  }
+
+  return false;
+}
+
+var morphVertex = function(obj, vertex, val){
+  var inf = obj.morphTargetInfluences[vertex];
+  inf += val;
+  if (inf < 0) inf = 0;
+  obj.morphTargetInfluences[vertex] = inf;
 }
 
 function scale(frame, object, prev) {
@@ -38,7 +87,7 @@ function translation(frame, object, prev) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
 
-  if (hl == 1 && fl == 2 && prev != null) {
+  if (hl == 1 && fl == 3 && prev != null) {
     var cont = $(renderer.domElement);
     var fromCoords = transform(prev, cont.width(), cont.height());
 
@@ -116,10 +165,6 @@ function translateObject(obj, vector){
   obj.translateX(vector.x);
   obj.translateY(vector.y);
   obj.translateZ(vector.z);
-}
-
-var morphVertex = function(obj, vertex, val){
-  obj.morphTargetInfluences[vertex] = val;
 }
 
 var scaleObject = function(obj, val){
@@ -247,27 +292,6 @@ function addObject(objectNum){
 
     collectionItem.grayness = grayness; // *** NOTE THIS
     objectCollection.add(collectionItem);
-
-    // leap object controls
-    var control = new THREE.LeapObjectControls(camera, collectionItem)
-
-    control.rotateEnabled  = true;
-    control.rotateSpeed    = 3;
-    control.rotateHands    = 1;
-    control.rotateFingers  = [2, 3];
-
-    control.scaleEnabled   = true;
-    control.scaleSpeed     = 3;
-    control.scaleHands     = 1;
-    control.scaleFingers   = [4, 5];
-
-    control.panEnabled     = true;
-    control.panSpeed       = 3;
-    control.panHands       = 2;
-    control.panFingers     = [6, 12];
-    control.panRightHanded = false; // for left-handed person
-
-    controls[collectionItem.id] = control;
   }
 
   objectCollection.name = "destroyReady";
