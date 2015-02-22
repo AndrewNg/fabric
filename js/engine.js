@@ -55,6 +55,13 @@ function init() {
 
   controller.connect();
 
+  var trackHand = function(hand){
+    var handMesh = hand.data('riggedHand.mesh');
+    console.log(handMesh.position.x);
+  };
+
+  controller.on('hand', trackHand);
+
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
   scene.add( light );
