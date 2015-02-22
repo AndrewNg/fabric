@@ -10,6 +10,7 @@ var theta = Math.PI;
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
+var cube;
 
 init();
 animate();
@@ -68,9 +69,31 @@ function init() {
 
   for(var i = 0; i < 1; i++ ) {
     var grayness = Math.random() * 0.5 + 0.25;
-    var mat = new THREE.MeshBasicMaterial();
+    var mat = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
     mat.color.setRGB( grayness, grayness, grayness );
-    var cube = new THREE.Mesh( geom, mat );
+    
+    for ( var i = 0; i < geom.vertices.length; i ++ ) {
+
+      var vertices = [];
+
+      for ( var v = 0; v < geom.vertices.length; v ++ ) {
+
+        vertices.push( geom.vertices[ v ].clone() );
+
+        if ( v === i ) {
+
+          vertices[ vertices.length - 1 ].x *= 2;
+          vertices[ vertices.length - 1 ].y *= 2;
+          vertices[ vertices.length - 1 ].z *= 2;
+
+        }
+
+      }
+
+      geom.morphTargets.push( { name: "target" + i, vertices: vertices } );
+
+    }
+    cube = new THREE.Mesh( geom, mat );
 
     cube.position.x = -10;
     cube.position.y = -10;
@@ -82,6 +105,12 @@ function init() {
 
     cube.grayness = grayness; // *** NOTE THIS
     cubes.add(cube);
+
+    var morphVertex = function(val){
+      cube.morphTargetInfluences[0] = val;
+    }
+
+    init.morphVertex = morphVertex;
 
     // leap object controls
     var control = new THREE.LeapObjectControls(camera, cube)
