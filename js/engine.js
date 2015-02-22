@@ -85,7 +85,8 @@ function initLeapMotion() {
         selected = lastSelected; 
         highlightObject(selected);
         if (translation(frame, selected, prevPointable) || 
-            rotation(frame, selected)) {
+            rotation(frame, selected, prevPointable) || 
+            scale(frame, selected, prevPointable)) {
           timer = new Stopwatch();
           timer.start();
         }
