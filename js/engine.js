@@ -12,9 +12,20 @@ var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
 var selected = null;
+var lastSelected = null;
+var timer;
 
 init();
 animate();
+
+var highlightObject = function(object) {
+  object.material.color.setHex(0xff0000);
+};
+
+var unHighlightObject = function(object) {
+  var grayness = object.grayness
+  object.material.color.setRGB(grayness,grayness,grayness);
+};
 
 // leap motion controller
 function initLeapMotion() { 
@@ -33,24 +44,51 @@ function initLeapMotion() {
   });
 
   controller.on('frame', function(frame){
-    var intersects = findObjects(frame, cubes);
-    if (intersects.length == 0) {
+    var selects = selector(frame, cubes);
+    if (selects.length == 0) {
       if (selected != null) {
-      var grayness = selected.grayness
-      selected.material.color.setRGB(grayness,grayness,grayness);
-      selected = null;
+        unHighlightObject(selected);
+        lastSelected = selected;
+        selected = null;
+
+        console.log('initial start timer');
+        timer = new Stopwatch();
+        timer.start();
       }
     }
     else {
-      var object = intersects[0].object
-      if (selected.id != obj.id) {
-        var grayness = selected.grayness
-        selected.material.color.setRGB(grayness,grayness,grayness);
+      var obj = selects[0].object;
+      if (selected != null && selected.id != obj.id) {
+        unHighlightObject(selected);
       }
       // if multiple selected, this will have to be a loop
       selected = obj;
-      selected.material.color.setHex(0xff0000);
-      controls[selected.id].update(frame);
+      highlightObject(selected);
+    }
+
+    console.log(lastSelected);
+    if (lastSelected != null) {
+      console.log(timer.lap());
+      if (timer.lap() <= 250) {
+        console.log('checking if object should be rotated');
+        selected = lastSelected; 
+        highlightObject(selected);
+        if (rotation(frame, selected) === true) {
+          console.log('resetting timer');
+          timer = new Stopwatch();
+          timer.start();
+        }
+        else {
+          unHighlightObject(selected);
+          selected = null;
+        }
+      }
+      else {
+        console.log('object deselected, reset');
+        unHighlightObject(lastSelected);
+        lastSelected = null;
+        timer.end();
+      }
     }
 
     var hl = frame.hands.length;
@@ -312,4 +350,22 @@ function render() {
   
   headControls.update();
   vrEffect.render( scene, camera );
+}
+
+Stopwatch = function() {
+  this.startMilliseconds = 0;
+  this.elapsedMilliseconds = 0;
+}
+
+Stopwatch.prototype.start = function() {
+  this.startMilliseconds = new Date().getTime();
+}
+
+Stopwatch.prototype.lap = function() {
+  return new Date().getTime() - this.startMilliseconds;
+}
+
+Stopwatch.prototype.end = function() {
+  this.elapsedMilliseconds = new Date().getTime() - this.startMilliseconds;
+  this.startMilliseconds = 0;
 }

@@ -1,6 +1,19 @@
 var projector = new THREE.Projector();
 
-function findObjects(frame, cubes) {
+function rotation(frame, object) {
+  var hl = frame.hands.length;
+  var fl = frame.fingers.filter(function(f){return f.extended}).length;
+  var rotates = [];
+
+  if (hl == 1 && fl == 2) {
+    console.log("rotation");
+    return true
+  }
+
+  return false;
+}
+
+function selector(frame, cubes) {
   var hl = frame.hands.length;
   var fl = frame.fingers.filter(function(f){return f.extended}).length;
   var intersects = [];
