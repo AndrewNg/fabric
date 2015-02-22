@@ -7,6 +7,7 @@ var headControls;
 var controller;
 var theta = Math.PI;
 var pinchStrength;
+var handPosition = [];
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
@@ -43,6 +44,16 @@ function initLeapMotion() {
       obj.material.color.setHex(0xff0000);
       controls[obj.id].update(frame);
     }
+
+    var hl = frame.hands.length;
+    var fl = frame.fingers.filter(function(f){return f.extended}).length;
+
+    if (hl == 1 && fl == 1) {
+      var f = frame.pointables[0];
+      var cont = $(renderer.domElement);
+      var coords = transform(f.tipPosition, cont.width(), cont.height());
+      handPosition = coords;
+    }
   });
 
   var getPinchStrength = function(hand){
@@ -71,7 +82,7 @@ function init() {
 
   var geom = new THREE.BoxGeometry( 50, 50, 50 );
 
-  cubes = new THREE.Object3D()
+  cubes = new THREE.Object3D();
 
   for(var i = 0; i < 1; i++ ) {
     var grayness = Math.random() * 0.5 + 0.25;
@@ -149,9 +160,21 @@ function init() {
       rotateAroundWorldAxis(cube, axes[axis], Math.PI / 180);
     }
 
+    var cameraZoom = function(){
+      var zoomFactor = 1.0, inc = 0.1; 
+      while(zoomFactor < 2){
+        // setTimeout(function(){
+        //   camera.fov *= zoomFactor;
+        //   camera.updateProjectionMatrix();
+        //   zoom += inc;
+        // }, 10);
+      }
+    }
+
     init.morphVertex = morphVertex;
     init.scaleObject = scaleObject;
     init.rotateObject = rotateObject;
+    init.cameraZoom = cameraZoom;
 
     // leap object controls
     var control = new THREE.LeapObjectControls(camera, cube)

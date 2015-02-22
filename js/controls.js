@@ -2,7 +2,7 @@ var projector = new THREE.Projector();
 
 function findObjects(frame, cubes) {
   var hl = frame.hands.length;
-  var fl = frame.fingers.filter(function(f){return f.extended}).length;;
+  var fl = frame.fingers.filter(function(f){return f.extended}).length;
   var intersects = [];
 
   if (hl == 1 && fl == 1) {
@@ -20,7 +20,7 @@ function findObjects(frame, cubes) {
     intersects = raycaster.intersectObjects(cubes.children);
 
     if(pinchStrength > 0.3){
-      init.rotateObject(1);
+      init.cameraZoom();
     }
   };
 
