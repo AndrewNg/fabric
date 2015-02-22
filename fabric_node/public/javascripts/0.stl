@@ -1,0 +1,65 @@
+solid pixelfacet normal vertex 0.5773502691896258 0.5773502691896258 0.5773502691896258 
+ 
+outer loop 
+vertex 0 70 0 
+vertex 0 0 70 
+vertex 70 0 0 
+endloop 
+endfacet 
+facet normal vertex 0.5773502691896258 -0.5773502691896258 0.5773502691896258 
+ 
+outer loop 
+vertex 0 0 70 
+vertex 0 -70 0 
+vertex 70 0 0 
+endloop 
+endfacet 
+facet normal vertex 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 
+ 
+outer loop 
+vertex 0 -70 0 
+vertex 0 0 -70 
+vertex 70 0 0 
+endloop 
+endfacet 
+facet normal vertex 0.5773502691896258 0.5773502691896258 -0.5773502691896258 
+ 
+outer loop 
+vertex 0 0 -70 
+vertex 0 70 0 
+vertex 70 0 0 
+endloop 
+endfacet 
+facet normal vertex -0.5773502691896258 0.5773502691896258 -0.5773502691896258 
+ 
+outer loop 
+vertex 0 70 0 
+vertex 0 0 -70 
+vertex -70 0 0 
+endloop 
+endfacet 
+facet normal vertex -0.5773502691896258 -0.5773502691896258 -0.5773502691896258 
+ 
+outer loop 
+vertex 0 0 -70 
+vertex 0 -70 0 
+vertex -70 0 0 
+endloop 
+endfacet 
+facet normal vertex -0.5773502691896258 -0.5773502691896258 0.5773502691896258 
+ 
+outer loop 
+vertex 0 -70 0 
+vertex 0 0 70 
+vertex -70 0 0 
+endloop 
+endfacet 
+facet normal vertex -0.5773502691896258 0.5773502691896258 0.5773502691896258 
+ 
+outer loop 
+vertex 0 0 70 
+vertex 0 70 0 
+vertex -70 0 0 
+endloop 
+endfacet 
+endsolid
