@@ -8,6 +8,7 @@ var controller;
 
 var mouse = new THREE.Vector2(), INTERSECTED;
 var radius = 100, theta = 0;
+var objects = [];
 
 init();
 animate();
@@ -16,14 +17,6 @@ function init() {
 
   container = document.createElement( 'div' );
   document.body.appendChild( container );
-
-  var info = document.createElement( 'div' );
-  info.style.position = 'absolute';
-  info.style.top = '10px';
-  info.style.width = '100%';
-  info.style.textAlign = 'center';
-  info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
-  container.appendChild( info );
 
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
   scene = new THREE.Scene();
@@ -44,15 +37,34 @@ function init() {
   object.rotation.y = Math.PI;
   object.rotation.z = Math.PI;
 
+    // leap object controls
+  var objectControls = new THREE.LeapObjectControls(camera, object);
+
+  objectControls.rotateEnabled  = true;
+  objectControls.rotateSpeed    = 3;
+  objectControls.rotateHands    = 1;
+  objectControls.rotateFingers  = [2, 3];
+
+  objectControls.scaleEnabled   = true;
+  objectControls.scaleSpeed     = 3;
+  objectControls.scaleHands     = 1;
+  objectControls.scaleFingers   = [4, 5];
+
+  objectControls.panEnabled     = true;
+  objectControls.panSpeed       = 3;
+  objectControls.panHands       = 2;
+  objectControls.panFingers     = [6, 12];
+  objectControls.panRightHanded = false; // for left-handed person
+
+  objects.push(object);
   scene.add( object );
 
   theta = Math.PI;
 
-  camera.position.x = 0;
+  camera.position.x = -100;
   camera.position.y = 0;
   camera.position.z = -100;
 
-  console.log(object.position);
   camera.lookAt( object.position );
 
   window.controller = controller = new Leap.Controller({
@@ -67,6 +79,13 @@ function init() {
   controller.use('boneHand', {
     scene: scene,
     arm: true
+  });
+
+  controller.on('frame', function(frame){
+    var index = focusObject(frame, objects);
+    if(index != -1){
+      objectControls.update(frame);
+    }
   });
 
   controller.connect();
@@ -193,5 +212,4 @@ function render() {
 
   headControls.update();
   vrEffect.render( scene, camera );
-
 }
