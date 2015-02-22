@@ -26,33 +26,7 @@ function init() {
   container.appendChild( info );
 
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-
   scene = new THREE.Scene();
-
-  window.controller = controller = new Leap.Controller({
-    background: true,
-    optimizeHMD: true,
-    vr: true
-  });
-
-  // controller.use('transform', {
-  //   quaternion: (new THREE.Quaternion).setFromEuler(new THREE.Euler(Math.PI * -0.3, 0, Math.PI, 'ZXY')),
-  //   position: new THREE.Vector3(0, 100, 0)
-  // });
-
-  controller.use('boneHand', {
-    scene: scene,
-    arm: true
-  });
-
-  controller.connect();
-
-  // var trackHand = function(hand){
-  //   var handMesh = hand.data('riggedHand.mesh');
-  //   console.log(handMesh.position.x);
-  // };
-
-  // controller.on('hand', trackHand);
 
   var light = new THREE.DirectionalLight( 0xffffff, 1 );
   light.position.set( 1, 1, 1 ).normalize();
@@ -77,8 +51,32 @@ function init() {
   camera.position.x = 0;
   camera.position.y = 0;
   camera.position.z = -100;
-  camera.lookAt( scene.position );
 
+  console.log(object.position);
+  camera.lookAt( object.position );
+
+  window.controller = controller = new Leap.Controller({
+    background: true
+  });
+
+  controller.use('transform', {
+    vr: true,
+    effectiveParent: camera
+  });
+
+  controller.use('boneHand', {
+    scene: scene,
+    arm: true
+  });
+
+  controller.connect();
+
+  // var trackHand = function(hand){
+  //   var handMesh = hand.data('riggedHand.mesh');
+  //   console.log(handMesh.position.x);
+  // };
+
+  // controller.on('hand', trackHand);
 
   raycaster = new THREE.Raycaster();
 
