@@ -18,6 +18,10 @@ function findObjects(frame, cubes) {
     console.log(vector.sub(camera.position).normalize());
     console.log(cubes.children.length);
     intersects = raycaster.intersectObjects(cubes.children);
+
+    if(pinchStrength > 0.5){
+      init.morphVertex(0, pinchStrength);
+    }
   };
 
   return intersects;

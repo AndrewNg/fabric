@@ -6,7 +6,7 @@ var mouseControls;
 var headControls;
 var controller;
 var theta = Math.PI;
-
+var pinchStrength;
 var mouse = new THREE.Vector2();
 var cubes;
 var controls = [];
@@ -44,6 +44,12 @@ function initLeapMotion() {
       controls[obj.id].update(frame);
     }
   });
+
+  var getPinchStrength = function(hand){
+    pinchStrength = hand.pinchStrength;
+  }
+
+  controller.on('hand', getPinchStrength);
 
   controller.connect();
 }
