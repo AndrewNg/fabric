@@ -167,7 +167,7 @@ function init() {
   // for (var i = 0; i < 10; i++) {
   //   addObject(9);
   // }
-  addObject(0);
+  addObject(6);
 
   initLeapMotion();
 

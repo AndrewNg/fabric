@@ -223,7 +223,7 @@ function destroyPrevObject(){
 };
 
 function addObject(objectNum){
-  // destroyPrevObject();
+  destroyPrevObject();
 
   var possibilities = [
     new THREE.BoxGeometry( 70, 70, 70 ),
@@ -284,13 +284,13 @@ function addObject(objectNum){
     }
     var collectionItem = new THREE.Mesh( geom, mat );
 
-    collectionItem.position.x = Math.random()* -100 + 50;
-    collectionItem.position.y = Math.random()* -100 + 50;
-    collectionItem.position.z = Math.random()* -100 + 50;
+    collectionItem.position.x = -25;
+    collectionItem.position.y = -25;
+    collectionItem.position.z = -25;
 
-    collectionItem.scale.x = Math.random() + 0.5;
-    collectionItem.scale.y = Math.random() + 0.5;
-    collectionItem.scale.z = Math.random() + 0.5;
+    collectionItem.scale.x = 1;
+    collectionItem.scale.y = 1;
+    collectionItem.scale.z = 1;
 
     collectionItem.grayness = grayness; // *** NOTE THIS
     objectCollection.add(collectionItem);
