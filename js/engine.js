@@ -54,7 +54,7 @@ function init() {
   document.body.appendChild( container );
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
   camera.position.x = radius;
   camera.position.y = radius;
   camera.position.z = radius;
